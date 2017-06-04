@@ -38,3 +38,6 @@ jspm_packages
 
 #vim copy file
 *~
+
+#dsstore
+.DS_Store
