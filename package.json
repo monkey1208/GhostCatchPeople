@@ -3,27 +3,25 @@
   "version": "1.0.0",
   "description": "CNLab final project",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "start": "node server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/monkey1208/GhostCatchPeople.git"
-  },
   "keywords": [
     "npm",
-    "node",
-    "package"
+    "package",
+    "node"
   ],
   "author": "team03",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/monkey1208/GhostCatchPeople/issues"
-  },
-  "homepage": "https://github.com/monkey1208/GhostCatchPeople#readme",
   "dependencies": {
-    "socket.io": "2.0.1",
-    "express": "4.15.3"
+    "body-parser": "~1.17.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.3",
+    "express": "~4.15.2",
+    "morgan": "~1.8.1",
+    "pug": "~2.0.0-beta11",
+    "serve-favicon": "~2.4.2"
   }
 }

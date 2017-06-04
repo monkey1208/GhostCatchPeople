@@ -14,4 +14,4 @@ app.get('/game', function(req, res){
 	res.sendFile(path.join(__dirname, '../', 'client', 'game.html'));
 	console.log("join game");
 });
-app.listen(8000);
+app.listen(process.env.PORT || 8000);
