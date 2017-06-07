@@ -43,7 +43,7 @@ game_socket.on('connection', function(socket){
 	player_position[socket.id] = position;
 	socket_list[socket.id] = socket;
 	socket.on('init', function(data, fn){
-		fn({x:socket.x, y:socket.y, isGhost:isGhost});
+		fn({x:socket.x, y:socket.y, isGhost:isGhost, id:socket.id});
 	});
 	socket.on('disconnect', function(){
 		delete socket_list[socket.id];

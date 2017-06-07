@@ -9,14 +9,15 @@ for(var i = 0; i < 1000; i ++){
    }
 }
 var x = 500, y = 250;
-var id, ghost;
+var id, isGhost;
 
 window.onload = function(){
    socket.emit('init', function(data){
       x = data.x;
       y = data.y;
       id = data.id;
-      ghost = data.ghost;
+      isGhost = data.isGhost;
+      console.log("init success!");
    });
 	var Img = {};
 	Img.ghost = new Image();
@@ -59,12 +60,13 @@ window.onload = function(){
             break;
       }   
       socket.emit('newPosition', {x: x, y: y}, function(data){
-         
       });
-
+      
+   }
+   socket.on('newPosition', function(data){
       var imgData = ctx.getImageData(0, 0, 1000, 500);
       var data = imgData.data;
-   
+
       for(var i = 0; i < data.length; i += 4){
          // console.log(map_init[y+Math.floor((i/4)/1000)][x+(i/4)%1000]);
          if(map_init[y+Math.floor((i/4)/1000)][x+(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
@@ -76,6 +78,8 @@ window.onload = function(){
          }
       }
       ctx.putImageData(imgData, 0, 0);
-   }
+   });
+
 }
+
 
