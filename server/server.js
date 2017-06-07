@@ -34,7 +34,7 @@ game_socket.on('connection', function(socket){
 	console.log("game connected");
 	socket.id = Math.random();
 	socket.x = Math.floor((Math.random()*1000));
-	socket.y = Math.floor((Math.random()*2000));
+	socket.y = Math.floor((Math.random()*500));
 	var isGhost = true;
 	if(ghost_num > people_num){
 		isGhost = false;
@@ -42,9 +42,7 @@ game_socket.on('connection', function(socket){
 	var position = {x:socket.x, y:socket.y, isGhost:isGhost};
 	player_position[socket.id] = position;
 	socket_list[socket.id] = socket;
-	socket.on('init', function(data, fn){
-		fn({x:socket.x, y:socket.y, isGhost:isGhost, id:socket.id});
-	});
+	socket.emit('init', {x:socket.x, y:socket.y, isGhost:isGhost, id:socket.id});
 	socket.on('disconnect', function(){
 		delete socket_list[socket.id];
 		delete player_position[socket.id];
@@ -65,8 +63,8 @@ setInterval(function(){
 	for (var i in socket_list){
 		var socket = socket_list[i];
 		pack.push({
-			x:socket.x,
-			y:socket.y,
+			x:player_position[socket.id].x,
+			y:player_position[socket.id].y,
 			isGhost:socket.isGhost
 		});
 	}

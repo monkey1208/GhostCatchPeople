@@ -12,7 +12,7 @@ var x = 500, y = 250;
 var id, isGhost;
 
 window.onload = function(){
-   socket.emit('init', function(data){
+   socket.on('init', function(data){
       x = data.x;
       y = data.y;
       id = data.id;
@@ -35,26 +35,41 @@ window.onload = function(){
 		}
 	});*/
    ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, 0, 0, 1000, 500);
+   /*var imgData = ctx.getImageData(0, 0, 1000, 500);
+   var data = imgData.data;
+
+   for(var i = 0; i < data.length; i += 4){
+      // console.log(map_init[y+Math.floor((i/4)/1000)][x+(i/4)%1000]);
+      if(map_init[y+Math.floor((i/4)/1000)][x+(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
+         data[i+3] = 255;
+
+      }
+      else{
+         data[i+3] = 0;
+      }
+   }
+   ctx.putImageData(imgData, 0, 0);*/
+   
    window.onkeydown = function(e){
-      ctx.clearRect(0, 0, 1000, 500);
+      //ctx.clearRect(0, 0, 1000, 500);
       switch(e.keyCode){
          case 37:
-            if(x >= 0){
+            if(x >= 5){
                x -= 5;
             }
             break;
          case 38:
-            if(y >= 0){
+            if(y >= 5){
                y -= 5;
             }
             break;
          case 39:
-            if(x <= 1000){
+            if(x <= 995){
                x += 5;
             }
             break;
          case 40:
-            if(y <= 500){
+            if(y <= 495){
                y += 5;
             }
             break;
@@ -65,16 +80,17 @@ window.onload = function(){
    }
    socket.on('newPosition', function(data){
       var imgData = ctx.getImageData(0, 0, 1000, 500);
-      var data = imgData.data;
-
-      for(var i = 0; i < data.length; i += 4){
+      var img = imgData.data;
+      x = data[0].x;
+      y = data[0].y;
+      for(var i = 0; i < img.length; i += 4){
          // console.log(map_init[y+Math.floor((i/4)/1000)][x+(i/4)%1000]);
          if(map_init[y+Math.floor((i/4)/1000)][x+(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
-            data[i+3] = 255;
+            img[i+3] = 255;
 
          }
          else{
-            data[i+3] = 0;
+            img[i+3] = 0;
          }
       }
       ctx.putImageData(imgData, 0, 0);
