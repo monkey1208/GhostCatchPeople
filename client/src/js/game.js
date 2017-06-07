@@ -9,12 +9,21 @@ for(var i = 0; i < 1000; i ++){
       map_init[i][j] = Math.random();
    }
 }
+var x = 500, y = 250;
+var id, ghost;
 
 window.onload = function(){
-   console.log(map_init);
+   socket.emit('init', function(data){
+      x = data.x;
+      y = data.y;
+      id = data.id;
+      ghost = data.ghost;
+   });
 	var Img = {};
 	Img.ghost = new Image();
 	Img.ghost.src = "src/img/ghost.jpg";
+   Img.human = new Image();
+   Img.human.src = "src/img/human.jpg";
    var box = document.getElementById("box");
 	var ctx = box.getContext("2d");
 	console.log('test');
@@ -26,33 +35,34 @@ window.onload = function(){
 		}
 	});*/
    ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, 0, 0, 1000, 500);
-   var x = 500;
-   var y = 250;
    window.onkeydown = function(e){
       ctx.clearRect(0, 0, 1000, 500);
       switch(e.keyCode){
          case 37:
-            if(x != 0){
+            if(x >= 0){
                x -= 5;
             }
             break;
          case 38:
-            if(y != 0){
+            if(y >= 0){
                y -= 5;
             }
             break;
          case 39:
-            if(x != 1000){
+            if(x <= 1000){
                x += 5;
             }
             break;
          case 40:
-            if(y != 500){
+            if(y <= 500){
                y += 5;
             }
             break;
       }   
-      //ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, x, y, 50, 50);
+      socket.emit('newPosition', {x: x, y: y}, function(data){
+         
+      });
+
       var imgData = ctx.getImageData(0, 0, 1000, 500);
       var data = imgData.data;
    
@@ -69,6 +79,3 @@ window.onload = function(){
       ctx.putImageData(imgData, 0, 0);
    }
 }
-socket.on('init', function(data){
-	socket.send('init');
-});
