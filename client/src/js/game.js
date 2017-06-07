@@ -1,5 +1,4 @@
-var socket = io('//localhost:8000');
-//socket.emit('init');
+var socket = io('//localhost:8000/game');
 var map_init = new Array(1000);
 for(var i = 0; i < 1000; i ++){
    map_init[i] = new Array(2000);
@@ -79,3 +78,4 @@ window.onload = function(){
       ctx.putImageData(imgData, 0, 0);
    }
 }
+
