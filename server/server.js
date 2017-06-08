@@ -33,8 +33,8 @@ io.on('connection', function(socket){
 game_socket.on('connection', function(socket){
 	console.log("game connected");
 	socket.id = Math.random();
-	socket.x = Math.floor((Math.random()*1000));
-	socket.y = Math.floor((Math.random()*500));
+	socket.x = Math.floor((Math.random()*1000)+500);
+	socket.y = Math.floor((Math.random()*500)+250);
 	var isGhost = true;
 	if(ghost_num > people_num){
 		isGhost = false;
