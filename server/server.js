@@ -3,6 +3,10 @@ var app = express();
 var server = require('http').Server(app);
 var path = require('path');
 var io = require('socket.io')(server);
+
+var map_width = 1000;
+var map_height = 500;
+
 server.listen(process.env.PORT || 8000);
 //io.listen(server);
 
@@ -33,12 +37,14 @@ io.on('connection', function(socket){
 game_socket.on('connection', function(socket){
 	console.log("game connected");
 	socket.id = Math.random();
-	socket.x = Math.floor((Math.random()*1000)+500);
-	socket.y = Math.floor((Math.random()*500)+250);
+	socket.x = Math.floor((Math.random()*map_width)+500);
+	socket.y = Math.floor((Math.random()*map_height)+250);
 	var isGhost = true;
 	if(ghost_num > people_num){
 		isGhost = false;
-	}
+		people_num ++;
+	}else
+		ghost_num ++;
 	var position = {x:socket.x, y:socket.y, isGhost:isGhost};
 	player_position[socket.id] = position;
 	socket_list[socket.id] = socket;
@@ -46,10 +52,33 @@ game_socket.on('connection', function(socket){
 	socket.on('disconnect', function(){
 		delete socket_list[socket.id];
 		delete player_position[socket.id];
+		if(player_position[socket.id].isGhost)
+			ghost_num --;
+		else
+			people_num --;
 	});
 	socket.on('newPosition', function(data, fn){
 		player_position[socket.id].x = data.x;
 		player_position[socket.id].y = data.y;
+	});
+	socket.on('gameover', function(){
+		if(player_position[socked.id].isGhost)
+			ghost_num --;
+		else
+			people_num --;
+		delete player_position[socket.id];
+
+	});
+	socket.on('restart', function(){	
+		socket.x = Math.floor((Math.random()*1000)+500);
+		socket.y = Math.floor((Math.random()*500)+250);
+		if(ghost_num > people_num){
+			isGhost = false;
+			people_num ++;
+		}else
+			ghost_num ++;
+		position = {x:socket.x, y:socket.y, isGhost:isGhost};
+		player_position[socket.id] = position;
 	});
 	
 	for (var i in socket_list){
