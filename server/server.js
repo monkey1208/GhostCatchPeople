@@ -45,17 +45,18 @@ game_socket.on('connection', function(socket){
 		people_num ++;
 	}else
 		ghost_num ++;
+	socket.isGhost = isGhost;
 	var position = {x:socket.x, y:socket.y, isGhost:isGhost};
 	player_position[socket.id] = position;
 	socket_list[socket.id] = socket;
 	socket.emit('init', {x:socket.x, y:socket.y, isGhost:isGhost, id:socket.id});
 	socket.on('disconnect', function(){
-		delete socket_list[socket.id];
-		delete player_position[socket.id];
 		if(player_position[socket.id].isGhost)
 			ghost_num --;
 		else
 			people_num --;
+		delete socket_list[socket.id];
+		delete player_position[socket.id];
 	});
 	socket.on('newPosition', function(data, fn){
 		player_position[socket.id].x = data.x;
@@ -92,6 +93,7 @@ setInterval(function(){
 	for (var i in socket_list){
 		var socket = socket_list[i];
 		pack.push({
+			id:socket.id,
 			x:player_position[socket.id].x,
 			y:player_position[socket.id].y,
 			isGhost:socket.isGhost
@@ -101,6 +103,6 @@ setInterval(function(){
 		var socket = socket_list[i];
 		socket.emit('newPosition', pack);
 	}
-}, 1000/50);
+}, 1000/15);
 
 
