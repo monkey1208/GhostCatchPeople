@@ -72,6 +72,6 @@ setInterval(function(){
 		var socket = socket_list[i];
 		socket.emit('newPosition', pack);
 	}
-}, 1000/25);
+}, 1000/50);
 
 
