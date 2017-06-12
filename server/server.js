@@ -63,11 +63,12 @@ game_socket.on('connection', function(socket){
 		player_position[socket.id].y = data.y;
 	});
 	socket.on('gameover', function(){
-		if(player_position[socked.id].isGhost)
+		if(player_position[socket.id].isGhost)
 			ghost_num --;
 		else
 			people_num --;
-		delete player_position[socket.id];
+		delete socket_list[socket.id];
+      delete player_position[socket.id];
 
 	});
 	socket.on('restart', function(){	

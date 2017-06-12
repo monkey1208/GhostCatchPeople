@@ -12,6 +12,7 @@ var x = 500, y = 250;
 var x_edge1 = 0, x_edge2 = 1000;
 var y_edge1 = 0, y_edge2 = 500;
 var id, isGhost;
+var score = 0;
 
 window.onload = function(){
 	var Img = {};
@@ -24,10 +25,15 @@ window.onload = function(){
 		y = data.y;
 		id = data.id;
 		isGhost = data.isGhost;
-		if(isGhost)
+      if(isGhost)
 			me.src = Img.ghost.src;
-		else
+		else{
 			me.src = Img.human.src;
+         setInterval(function(){
+            score += 1;
+            $("#scoreboard").text(score);
+         }, 1000);
+      }
 		console.log("init success!");
 	});
 	var meee = document.getElementById("me");
@@ -35,13 +41,7 @@ window.onload = function(){
 	var ctx = box.getContext("2d");
 	console.log('test');
 
-	isCollide = function(rect1, rect2) {
-		return    rect1.x <= rect2.x + rect2.width
-			   && rect2.x <= rect1.x + rect1.width
-			   && rect1.y <= rect2.y + rect2.height
-			   && rect2.y <= rect1.y + rect1.height;
-	}
-
+	
 	/*socket.on('newPosition', function(data){
 		ctx.clearRect(0, 0, 1000, 500);
 		console.log('newposition');
@@ -110,7 +110,7 @@ window.onload = function(){
 			}else{
 				var position = {x:data[i].x, y:data[i].y, isGhost:data[i].isGhost, id:data[i].id};
 				player_position[data[i].id] = position;
-			}
+         }
 		}
 
 		x_edge1 = x - 500;
@@ -118,88 +118,37 @@ window.onload = function(){
 		y_edge1 = y - 250;
 		y_edge2 = y + 250;
 
-		
-		if(x <= 500 || x >= 1500 || y <= 250 || y >= 750){//at the edge
-			if(x <= 500){
-				x_edge1 = 0;
-				x_edge2 = 1000;
-				me.style.left = 600 + (x - 500);
-				if(y < 750 && y > 250){
-					for(var i = 0; i < img.length; i += 4){
-						if(map_init[(y-250)+Math.floor((i/4)/1000)][(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
-							img[i+3] = 255;
-						}
-						else{
-							img[i+3] = 0;
-						}
-					}
-					ctx.putImageData(imgData, 0, 0);
-				}
-			}
-			if(x >= 1500){
-				x_edge1 = 1000;
-				x_edge2 = 2000;
-				me.style.left = 600 + (x - 1500);
-				if(y < 750 && y > 250){
-					for(var i = 0; i < img.length; i += 4){
-						if(map_init[(y-250)+Math.floor((i/4)/1000)][1000 + (i/4)%1000]>=0.7){ // map_init[??] >= 0.7
-							img[i+3] = 255;
-						}
-						else{
-							img[i+3] = 0;
-						}
-					}
-					ctx.putImageData(imgData, 0, 0);
-				}
+		if(x <= 500){
+         x_edge1 = 0;
+         x_edge_2 = 1000;
+         me.style.left = 600 + (x - 500);
+      }
+      else if(x >= 1500){
+         x_edge1 = 1000;
+         x_edge2 = 2000;
+         me.style.left = 600 + (x - 1500);
+      }
+      if(y <= 250){
+         y_edge1 = 0;
+         y_edge2 = 500;
+         me.style.top = 300 + (y - 250);
+      }
+      else if(y >= 750){
+         y_edge1 = 500;
+         y_edge2 = 1000;
+         me.style.top = 300 + (y - 750);
+      }
+      for(var i = 0; i < img.length; i += 4){
+         if(map_init[y_edge1+Math.floor((i/4)/1000)][x_edge1+(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
+            img[i+3] = 255;
+         }
+         else{
+            img[i+3] = 0;
+         }
+      }
+      ctx.putImageData(imgData, 0, 0);
 
-			}
-			if(y <= 250){
-				y_edge1 = 0;
-				y_edge2 = 500;
-				me.style.top = 300 + (y - 250);
-				if(x < 1500 && x > 500){
-					for(var i = 0; i < img.length; i += 4){
-						if(map_init[Math.floor((i/4)/1000)][(x-500) + (i/4)%1000]>=0.7){ // map_init[??] >= 0.7
-							img[i+3] = 255;
-						}
-						else{
-							img[i+3] = 0;
-						}
-					}
-					ctx.putImageData(imgData, 0, 0);
-				}
-
-			}
-			if(y >= 750){
-				y_edge1 = 500;
-				y_edge2 = 1000;
-				me.style.top = 300 + (y - 750);
-				if(x < 1500 && x > 500){
-					for(var i = 0; i < img.length; i += 4){
-						if(map_init[500 + Math.floor((i/4)/1000)][(x-500) + (i/4)%1000]>=0.7){ // map_init[??] >= 0.7
-							img[i+3] = 255;
-						}
-						else{
-							img[i+3] = 0;
-						}
-					}
-					ctx.putImageData(imgData, 0, 0);
-				}
-			}
-		}
-		else{
-			
-			for(var i = 0; i < img.length; i += 4){
-				if(map_init[(y-250)+Math.floor((i/4)/1000)][(x-500)+(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
-					img[i+3] = 255;
-				}
-				else{
-					img[i+3] = 0;
-				}
-			}
-			ctx.putImageData(imgData, 0, 0);
-		}
-		//console.log("x1 = "+x_edge1+" x2 = "+x_edge2+" y1 = "+y_edge1+" y2 = "+y_edge2)
+      //console.log("x1 = "+x_edge1+" x2 = "+x_edge2+" y1 = "+y_edge1+" y2 = "+y_edge2)
 		for(var i in player_position){
 			//console.log("position x = "+i.x+" y = "+i.y);
 			if(player_position[i].x > x_edge1 && player_position[i].x < x_edge2 && player_position[i].y > y_edge1 && player_position[i].y < y_edge2){
@@ -207,12 +156,29 @@ window.onload = function(){
 					ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, player_position[i].x - x_edge1, player_position[i].y - y_edge1, 50, 50);
 				else
 					ctx.drawImage(Img.human, 0, 0, Img.human.width, Img.human.height, player_position[i].x - x_edge1, player_position[i].y - y_edge1, 50, 50);
-					
-			}
+         }
+         if(isCollide(player_position[i], x, y)){
+            console.log(player_position[i],x,y);
+            if(isGhost){
+               score += 100;
+               $("#scoreboard").text(score);
+            }
+            else{
+               alert("gameover");
+               //socket.emit("gameover");
+               socket.disconnect();
+               document.location.href = "/";
+            }
+         }
 		}
 
 	});
-
 }
 
+function isCollide(rect1, x, y) {
+   return    rect1.x <= x + 50
+         && rect1.x >= x - 50
+         && rect1.y <= y + 50
+         && rect1.y >= y - 50;
+}
 
