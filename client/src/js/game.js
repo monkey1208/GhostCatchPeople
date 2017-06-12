@@ -13,6 +13,7 @@ var x_edge1 = 0, x_edge2 = 1000;
 var y_edge1 = 0, y_edge2 = 500;
 var id, isGhost;
 var score = 0;
+var width, height;
 
 window.onload = function(){
 	var Img = {};
@@ -20,7 +21,10 @@ window.onload = function(){
 	Img.ghost.src = "src/img/ghost.jpg";
 	Img.human = new Image();
 	Img.human.src = "src/img/human.jpg";
-	socket.on('init', function(data){
+	width = $(window).width();
+   height = $(window).height();
+   
+   socket.on('init', function(data){
 		x = data.x;
 		y = data.y;
 		id = data.id;
@@ -38,7 +42,9 @@ window.onload = function(){
 	});
 	var meee = document.getElementById("me");
 	var box = document.getElementById("box");
-	var ctx = box.getContext("2d");
+	box.style.width = width;
+   box.style.height = height;
+   var ctx = box.getContext("2d");
 	console.log('test');
 
 	
@@ -164,8 +170,6 @@ window.onload = function(){
                $("#scoreboard").text(score);
             }
             else{
-               alert("gameover");
-               //socket.emit("gameover");
                socket.disconnect();
                document.location.href = "/";
             }
