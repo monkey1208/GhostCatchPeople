@@ -1,5 +1,8 @@
 var socket = io('//localhost:8000/game');
 var map_init = new Array(1000);
+/* TODO */
+/* generate a reasonable map */
+
 for(var i = 0; i < 1000; i ++){
 	map_init[i] = new Array(2000);
 }
@@ -14,6 +17,7 @@ var y_edge1 = 0, y_edge2 = 500;
 var id, isGhost;
 var score = 0;
 var width, height;
+var speed = 10;
 
 window.onload = function(){
 	var Img = {};
@@ -40,10 +44,9 @@ window.onload = function(){
       }
 		console.log("init success!");
 	});
-	var meee = document.getElementById("me");
 	var box = document.getElementById("box");
-	box.style.width = width;
-   box.style.height = height;
+	//box.style.width = width;
+   //box.style.height = height;
    var ctx = box.getContext("2d");
 	console.log('test');
 
@@ -74,30 +77,29 @@ window.onload = function(){
 	
 	window.onkeydown = function(e){
 		//ctx.clearRect(0, 0, 1000, 500);
-		var speed = 20;
+		
 		switch(e.keyCode){
 			case 37:
-				if(x >= 5){ //505
+				if(x >= 10){ //505
 					x -= speed;
 				}
 				break;
 			case 38:
-				if(y >= 5){ //255
+				if(y >= 10){ //255
 					y -= speed;
 				}
 				break;
 			case 39:
-				if(x <= 1995){ //1495
+				if(x <= 1940){ //1495
 					x += speed;
 				}
 				break;
 			case 40:
-				if(y <= 995){ //745
+				if(y <= 950){ //745
 					y += speed;
 				}
 				break;
 		}	
-		//alert(x + ", " +  y);
 		socket.emit('newPosition', {x: x, y: y}, function(data){
 		});
 		
@@ -127,22 +129,22 @@ window.onload = function(){
 		if(x <= 500){
          x_edge1 = 0;
          x_edge_2 = 1000;
-         me.style.left = 600 + (x - 500);
+         me.style.left = width/2 + (x - 500);
       }
       else if(x >= 1500){
          x_edge1 = 1000;
          x_edge2 = 2000;
-         me.style.left = 600 + (x - 1500);
+         me.style.left = width/2 + (x - 1500);
       }
       if(y <= 250){
          y_edge1 = 0;
          y_edge2 = 500;
-         me.style.top = 300 + (y - 250);
+         me.style.top = 250 + (y - 250);
       }
       else if(y >= 750){
          y_edge1 = 500;
          y_edge2 = 1000;
-         me.style.top = 300 + (y - 750);
+         me.style.top = 250 + (y - 750);
       }
       for(var i = 0; i < img.length; i += 4){
          if(map_init[y_edge1+Math.floor((i/4)/1000)][x_edge1+(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
@@ -175,7 +177,10 @@ window.onload = function(){
             }
          }
 		}
-
+      /* TODO */
+      /* continually read incoming volume and tell if it is a skill, 
+       * volume --> affect speed,
+       * skill --> socket.emit('skill name') --> socket.on('skill name', function(){});*/
 	});
 }
 

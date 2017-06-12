@@ -82,7 +82,11 @@ game_socket.on('connection', function(socket){
 		position = {x:socket.x, y:socket.y, isGhost:isGhost};
 		player_position[socket.id] = position;
 	});
-	
+
+   /* TODO */
+   /* skill1, 2, 3, 4, 5 ... */
+   /* socket.on('skill1/2/3/4/5', function(){do something});*/
+
 	for (var i in socket_list){
 		console.log("socket "+socket_list[i].id);
 		console.log("position x = "+player_position[i].x+", y = "+player_position[i].y);
