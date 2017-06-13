@@ -102,6 +102,7 @@ game_socket.on('connection', function(socket){
 			case 1:
 				break;
 			case 2:
+				player_position[socket.id].skill = 2;
 				setTimeout(function(){
 					player_position[socket.id].skill = 0;},
 					3000, '3sec boost!');
