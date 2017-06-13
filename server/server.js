@@ -186,7 +186,7 @@ game_socket.on('connection', function(socket){
 						delete explode_position[danger_id];
 						}, 1000, 'explode');
 					},
-					1000, 'danger -> explode');
+					5000, 'danger -> explode');
 				break;
 			case 2:
 				player_position[socket.id].skill = 2;
@@ -203,6 +203,10 @@ game_socket.on('connection', function(socket){
 				}
 				player_position[socket.id].x = randx*block_size;
 				player_position[socket.id].y = randy*block_size;
+				break;
+			case 4:
+				player_position[socket.id].x = data.x;
+				player_position[socket.id].y = data.y;
 				break;
 		}
 	});

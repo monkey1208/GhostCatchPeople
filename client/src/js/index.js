@@ -1,8 +1,8 @@
 var Href = location.href;
-socket = io.connect('//localhost:8000');
+socket = io.connect('//10.5.7.155:8000');
 //socket.emit('init');
 function join(){
-	console.log("join");	
+	console.log("join");
 	document.location.href = Href+"game";
 }
 function switchContent(id){
