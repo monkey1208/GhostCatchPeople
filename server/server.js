@@ -29,6 +29,8 @@ app.get('/game', function(req, res){
 
 var socket_list = {};
 var player_position = {};
+var danger_position = {};
+var explode_position = {};
 var ghost_num = 0;
 var people_num = 0;
 var game_socket = io.of('/game');
@@ -100,6 +102,17 @@ game_socket.on('connection', function(socket){
 		var skill = data.skill;
 		switch(skill){
 			case 1:
+				//
+				var danger_id = Math.random();
+				danger_position[danger_id] = { x:player_position[socket.id].x , y:player_position[socket.id].y };
+				setTimeout(function(){
+					explode_position[danger_id] = {x:danger_position[danger_id].x, y:danger_position[danger_id].y};
+					delete danger_position[danger_id];
+					setTimeout(function(){
+						delete explode_position[danger_id];
+						}, 1000, 'explode');
+					},
+					1000, 'danger -> explode');
 				break;
 			case 2:
 				player_position[socket.id].skill = 2;
@@ -138,6 +151,6 @@ setInterval(function(){
 	}
 	for (var i in socket_list){
 		var socket = socket_list[i];
-		socket.emit('newPosition', pack);
+		socket.emit('newPosition', {pack:pack, danger_pos:danger_position, explode_pos:explode_position});
 	}
 }, 1000/15);
