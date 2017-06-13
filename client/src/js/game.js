@@ -382,7 +382,7 @@ window.onload = function(){
 
         if (dead) {
             socket.disconnect();
-            document.location.href = "/";
+            document.location.href = "/gameover";
         }
         for(var i in player_position){
             if(player_position[i].x > x_edge1 && player_position[i].x < x_edge2
