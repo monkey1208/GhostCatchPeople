@@ -11,9 +11,9 @@ var R_DISTANCE = 180
 // Displaying Constansts
 var WIDTH=500;
 var HEIGHT=50;
-var ENERGY_COLOR = '#EEEE00'
+var ENERGY_COLOR = '#FF6666';
 
-var server_ip = 'localhost'
+var server_ip = 'localhost';
 var socket = io('//'+server_ip+':8000/game');
 
 var map_width = 2100;
@@ -414,9 +414,9 @@ window.onload = function(){
        else{
            speed_canvasContext.clearRect(0,0,WIDTH,HEIGHT);
            if (meter.checkClipping())
-            speed_canvasContext.fillStyle = "red";
+            speed_canvasContext.fillStyle = "#FFB366";
            else
-            speed_canvasContext.fillStyle = "green";
+            speed_canvasContext.fillStyle = "#2F6844";
            speed = 5+Math.floor(40*meter.volume);
            speed_canvasContext.fillRect(0, 0, speed*WIDTH/45, HEIGHT);
            $("#speedboard").text(speed);

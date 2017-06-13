@@ -6,13 +6,24 @@
 		<link rel="stylesheet" type="text/css" href="src/css/game.css">
 		<title>Ghost Catch People</title>
 	</head>
-	<body style="background:rgba(73, 6, 18, 1);">
-      <center><canvas id="box" width="1000" height="500" style="border:2px solid #000000"></canvas></center>
-	  <div>Energy:<span id='energyboard'>0</span></div>
-	  <canvas id="energy" width="500" height="50"></canvas>
-	  <br>
-	  <div>Speed:<span id='speedboard'>0</span></div>
-      <canvas id="speed" width="500" height="50"></canvas>
-      
+	<body style="background:rgba(187,123,86,1);">
+      <div style="width:100%; background-color:#956244; height:85px;">
+         <div id="title" style="float:left;margin-right:20px;">Welcome to GCP!</div> 
+         <div style="float:right; margin-top:20px;color:white;font-family:'Mountains of Christmas';font-size:25px;">Energy:
+            <canvas id="energy" width="300" height="35"></canvas>
+            <span id="energyboard">0</span>
+         </div>
+         <div style="float:right; margin-top:20px;margin-right:20px;color:white;font-family:'Mountains of Christmas';font-size:25px;">Speed:
+            <canvas id="speed" width="300" height="35"></canvas>
+            <span id="speedboard">0</span>
+         </div>
+      </div>
+      <center><canvas id="box" width="1000" height="500" style="border:5px solid #583E23;margin-top:10px;"></canvas></center>
+      <div id="skills">
+         <span style="font-size:40px;"><img src="src/img/bomb.png" width="40" height="40">Q</span><span>: BOMB!!!</span>
+         <span style="margin-left:10px;font-size:40px;"><img src="src/img/exchange.png" width="40" height="40">&nbsp;W</span><span>: Camouflage</span>
+         <span style="margin-left:10px;font-size:40px;"><img src="src/img/speed.png" width="40" height="40">&nbsp;E</span><span>: Teleport</span>
+         <span style="margin-left:10px;font-size:40px;"><img src="src/img/flash.png" width="40" height="40">&nbsp;R</span><span>: Flash</span>
+      </div>
    </body>
 </html>

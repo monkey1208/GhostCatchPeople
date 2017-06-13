@@ -17,4 +17,13 @@ body{
    color: white;
    font-size:50px;
    margin-left:20px;
+   padding:10px;
+}
+
+#skills{
+   font-family: 'Mountains of Christmas';
+   color: white;
+   font-size:30px;
+   text-align:center;
+   margin-top:10px;
 }
