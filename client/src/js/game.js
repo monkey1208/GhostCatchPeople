@@ -51,15 +51,6 @@ window.onload = function(){
 	console.log('test');
 
 	
-	/*socket.on('newPosition', function(data){
-		ctx.clearRect(0, 0, 1000, 500);
-		console.log('newposition');
-		for(var i = 0; i < data.length; i++){
-			ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, data[i].x, data[i].y, 50, 50);
-		}
-	});*/
-	//ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, 0, 0, 1000, 500);
-	//ctx.drawImage(Img.human, 0, 0, Img.human.width, Img.human.height, 0, 0, 1000, 500);
 	/*var imgData = ctx.getImageData(0, 0, 1000, 500);
 	var data = imgData.data;
 
@@ -77,31 +68,47 @@ window.onload = function(){
 	
 	window.onkeydown = function(e){
 		//ctx.clearRect(0, 0, 1000, 500);
-		
+		var update_pos = true;
 		switch(e.keyCode){
 			case 37:
+				update_pos = true;
 				if(x >= 10){ //505
 					x -= speed;
 				}
 				break;
 			case 38:
+				update_pos = true;
 				if(y >= 10){ //255
 					y -= speed;
 				}
 				break;
 			case 39:
+				update_pos = true;
 				if(x <= 1940){ //1495
 					x += speed;
 				}
 				break;
 			case 40:
+				update_pos = true;
 				if(y <= 950){ //745
 					y += speed;
 				}
 				break;
+			case 87:
+				update_pos = false;
+				break;
+				
 		}	
-		socket.emit('newPosition', {x: x, y: y}, function(data){
-		});
+		if(update_pos){
+			socket.emit('newPosition', {x: x, y: y}, function(data){
+			});
+		}
+		else{
+			// skill!
+			// TODO voice control skill
+			// below is an example
+			socket.emit('skill', {skill: 3}, function(data){});
+		}
 		
 	}
 	socket.on('newPosition', function(data){
@@ -179,8 +186,7 @@ window.onload = function(){
 		}
       /* TODO */
       /* continually read incoming volume and tell if it is a skill, 
-       * volume --> affect speed,
-       * skill --> socket.emit('skill name') --> socket.on('skill name', function(){});*/
+       * volume --> affect speed, */
 	});
 }
 
