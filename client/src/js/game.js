@@ -10,12 +10,14 @@ for(var i = 0; i < map_height; i ++){
 var x = 500, y = 250;
 var x_edge1 = 0, x_edge2 = 1000;
 var y_edge1 = 0, y_edge2 = 500;
+var x_mypos = 500, y_mypos = 250;
 var id, isGhost;
 var score = 0;
 var width, height;
 var speed = 30;
 var block_size = 50;
 var game_map;
+var me;
 
 var mediaStreamSource = null;
 var meter = null;
@@ -26,7 +28,7 @@ window.onload = function(){
 	Img.ghost.src = "src/img/ghost.jpg";
 	Img.human = new Image();
 	Img.human.src = "src/img/human.jpg";
-	width = $(window).width();
+   width = $(window).width();
     height = $(window).height();
 
     /*This section is for volume recognizing */
@@ -71,9 +73,9 @@ window.onload = function(){
 		id = data.id;
 		isGhost = data.isGhost;
 		if(isGhost)
-			me.src = Img.ghost.src;
+			me = Img.ghost;
 		else{
-			me.src = Img.human.src;
+			me = Img.human;
 		 setInterval(function(){
 		    score += 1;
 		    $("#scoreboard").text(score);
@@ -91,7 +93,7 @@ window.onload = function(){
 		//ctx.clearRect(0, 0, 1000, 500);
 		var update_pos = true;
         var skill = 0;
-		var speed = 50;
+		//var speed = 50;
 		var oldX = x, oldY = y;
 		switch(e.keyCode){
 			case 37:
@@ -110,7 +112,7 @@ window.onload = function(){
 				}
 				break;
 			case 40:
-				if(y <= 100){ //745
+				if(y <= 1000){ //745
 					y += speed;
 				}
 				break;
@@ -148,48 +150,18 @@ window.onload = function(){
 		var imgData = ctx.getImageData(0, 0, 1000, 500);
 		var img = imgData.data;
 		ctx.clearRect(0, 0, 1000, 500);
-		var me = document.getElementById("me");
 		var player_position = {};
 
 		for(var i = 0; i < data.length; i++){
 			if(id == data[i].id){
 				x = data[i].x;
 				y = data[i].y;
-                if (data[i].skill == 2)
-                    speed = 20;
-                else
-                    speed = 10;
 			}else{
 				var position = {x:data[i].x, y:data[i].y, isGhost:data[i].isGhost, id:data[i].id};
 				player_position[data[i].id] = position;
          }
 		}
-
-		x_edge1 = x - 500;
-		x_edge2 = x + 500;
-		y_edge1 = y - 250;
-		y_edge2 = y + 250;
-
-		if(x <= 500){
-         x_edge1 = 0;
-         x_edge_2 = 1000;
-         me.style.left = width/2 + (x - 500);
-      }
-      else if(x >= 1550){
-         x_edge1 = 1050;
-         x_edge2 = 2050;
-         me.style.left = width/2 + (x - 1500);
-      }
-      if(y <= 250){
-         y_edge1 = 0;
-         y_edge2 = 500;
-         me.style.top = 250 + (y - 250);
-      }
-      else if(y >= 800){
-         y_edge1 = 550;
-         y_edge2 = 1050;
-         me.style.top = 300 + (y - 800);
-      }
+      getPosition(x, y); 
       for(var i = 0; i < img.length; i += 4){
          if(map_init[y_edge1+Math.floor((i/4)/1000)][x_edge1+(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
             img[i+3] = 255;
@@ -199,11 +171,11 @@ window.onload = function(){
          }
       }
       ctx.putImageData(imgData, 0, 0);
+      ctx.drawImage(me, 0, 0, me.width, me.height, x_mypos, y_mypos, 50, 50);
 
-      //console.log("x1 = "+x_edge1+" x2 = "+x_edge2+" y1 = "+y_edge1+" y2 = "+y_edge2)
 		for(var i in player_position){
-			//console.log("position x = "+i.x+" y = "+i.y);
-			if(player_position[i].x > x_edge1 && player_position[i].x < x_edge2 && player_position[i].y > y_edge1 && player_position[i].y < y_edge2){
+			if(player_position[i].x > x_edge1 && player_position[i].x < x_edge2 
+            && player_position[i].y > y_edge1 && player_position[i].y < y_edge2){
 				if(player_position[i].isGhost)
 					ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, player_position[i].x - x_edge1, player_position[i].y - y_edge1, 50, 50);
 				else
@@ -228,7 +200,7 @@ window.onload = function(){
        	console.log("Mic is not avialible yet.");
        }
        else{
-       	speed = 5+40*meter.volume
+       	speed = 5+Math.floor(40*meter.volume);
        }
        
 	});
@@ -315,4 +287,34 @@ function volumeAudioProcess( event ) {
     // to the previous sample - take the max here because we
     // want "fast attack, slow release."
     this.volume = Math.max(rms, this.volume*this.averaging);
+}
+
+function getPosition(x, y){
+   x_edge1 = x - 500;
+   x_edge2 = x + 500;
+   y_edge1 = y - 250;
+   y_edge2 = y + 250;
+   x_mypos = 500;
+   y_mypos = 250;
+
+   if(x <= 500){
+      x_edge1 = 0;
+      x_edge_2 = 1000;
+      x_mypos = x;
+   }
+   else if(x >= 1550){
+      x_edge1 = 1050;
+      x_edge2 = 2050;
+      x_mypos = 500 + (x - 1550);
+   }
+   if(y <= 250){
+      y_edge1 = 0;
+      y_edge2 = 500;
+      y_mypos = y;
+   }
+   else if(y >= 800){
+      y_edge1 = 550;
+      y_edge2 = 1050;
+      y_mypos = 250 + (y - 800);
+   }
 }
