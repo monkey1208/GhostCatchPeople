@@ -149,13 +149,16 @@ window.onload = function(){
 		}
 		
 	}
-	socket.on('newPosition', function(data){
+	socket.on('newPosition', function(d){
 		var imgData = ctx.getImageData(0, 0, 1000, 500);
 		var img = imgData.data;
 		ctx.clearRect(0, 0, 1000, 500);
 		var me = document.getElementById("me");
 		var player_position = {};
 		
+		var data = d.pack;
+		var danger_pos = d.danger_pos;
+		var explode_pos = d.explode_pos;
 		for(var i = 0; i < data.length; i++){
 			if(id == data[i].id){
 				x = data[i].x;
