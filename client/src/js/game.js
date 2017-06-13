@@ -146,7 +146,7 @@ window.onload = function(){
 			socket.emit('skill', {skill: skill}, function(data){});
 		}
 	}
-	socket.on('newPosition', function(data){
+	socket.on('newPosition', function(d){
 		var imgData = ctx.getImageData(0, 0, 1000, 500);
 		var img = imgData.data;
 		ctx.clearRect(0, 0, 1000, 500);
@@ -154,7 +154,7 @@ window.onload = function(){
 		
 		var data = d.pack;
 		var danger_pos = d.danger_pos;
-        console.log(danger_pos);
+        	//console.log(danger_pos);
 		var explode_pos = d.explode_pos;
 
 		for(var i = 0; i < data.length; i++){
