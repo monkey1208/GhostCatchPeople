@@ -236,7 +236,8 @@ window.onload = function(){
            console.log("mic unable now.");
        }
        else{
-       	console.log("Current volume "+meter.volume);
+       	speed = 5 + 35*meter.volume
+       	//console.log("Current volume "+meter.volume);
        }
 	});
 }
