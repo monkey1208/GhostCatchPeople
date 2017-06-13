@@ -224,7 +224,7 @@ window.onload = function(){
       /* TODO */
       /* continually read incoming volume and tell if it is a skill,
        * volume --> affect speed, */
-       if(volume == null){
+       if(meter == null){
        	console.log("Mic is not avialible yet.");
        }
        else{
