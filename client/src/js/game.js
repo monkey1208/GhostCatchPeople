@@ -1,4 +1,4 @@
-var socket = io('//localhost:8000/game');
+var socket = io('//10.5.5.29:8000/game');
 
 var map_width = 2100;
 var map_height = 1100;
@@ -8,6 +8,7 @@ for(var i = 0; i < map_height; i ++){
 }
 
 var x = 500, y = 250;
+var flash_x, flash_y;
 var x_edge1 = 0, x_edge2 = 1000;
 var y_edge1 = 0, y_edge2 = 500;
 var x_mypos = 500, y_mypos = 250;
@@ -18,6 +19,7 @@ var speed = 30;
 var block_size = 100;
 var game_map;
 var me;
+var lastkey = 0;
 
 var mediaStreamSource = null;
 var meter = null;
@@ -103,21 +105,25 @@ window.onload = function(){
 		var oldX = x, oldY = y;
 		switch(e.keyCode){
 			case 37:
+				lastkey = 1;
 				if(x >= block_size){ //505
 					x -= speed;
 				}
 				break;
 			case 38:
+				lastkey = 2;
 				if(y >= block_size){ //255
 					y -= speed;
 				}
 				break;
 			case 39:
+				lastkey = 3;
 				if(x <= map_width - block_size){ //1495
 					x += speed;
 				}
 				break;
 			case 40:
+				lastkey = 4;
 				if(y <= map_height - block_size){ //745
 					y += speed;
 				}
@@ -143,6 +149,11 @@ window.onload = function(){
 					update_pos = false;
 					break;
 				}
+			case 82: //r
+				update_pos = false;
+				skill = 4;
+				flash();
+				break;
 		}
 		if(update_pos){
 			// Collision with wall
@@ -166,7 +177,11 @@ window.onload = function(){
 			// skill!
 			// TODO voice control skill
 			// below is an example
-			socket.emit('skill', {skill: skill}, function(data){});
+			if(skill == 4){
+				socket.emit('skill', {skill: skill, x:flash_x, y:flash_y}, function(data){});
+			}else{
+				socket.emit('skill', {skill: skill}, function(data){});
+			}
 		}
 	}
 	socket.on('newPosition', function(d){
@@ -315,6 +330,57 @@ function isCollide(rect1, x, y) {
          && rect1.y >= y - 50;
 }
 
+function flash(){
+    var current_x = x;
+    var current_y = y;
+    //console.log("current x="+current_x+" y="+current_y);
+    if(lastkey == 1){
+	for(var i = 180; i >= 0; i--){
+	    //console.log("left = "+map_init[current_y][current_x-i]+" right = "+map_init[current_y][current_x-i+50]);
+	    if(current_x-i<0)
+		continue;
+	    if(map_init[current_y][current_x-i] == 0 && map_init[current_y][current_x-i+50] == 0){
+		flash_x = current_x - i;
+		flash_y = current_y;
+		break;
+	    }
+	}
+    }else if(lastkey == 2){
+	for(var i = 180; i >= 0; i--){
+	    if(current_y-i<0)
+		continue;
+	    if(map_init[current_y-i][current_x] == 0 && map_init[current_y-i+50][current_x] == 0){
+		flash_x = current_x;
+		flash_y = current_y - i;
+		break;
+	    }
+	}
+    }else if(lastkey == 3){
+	for(var i = 180; i >= 0; i--){
+	    if(current_x+i+50>=map_width)
+		continue;
+	    if(map_init[current_y][current_x+i] == 0 && map_init[current_y][current_x+i+50] == 0){
+		flash_x = current_x + i;
+		flash_y = current_y;
+		break;
+	    }
+	}
+	
+    }else{
+	for(var i = 180; i >= 0; i--){
+	    if(current_y+i+50>=map_height)
+		continue;
+	    if(map_init[current_y+i][current_x] == 0 && map_init[current_y+i+50][current_x] == 0){
+		flash_x = current_x;
+		flash_y = current_y + i;
+		break;
+	    }
+	}
+        
+    }
+    //console.log("flash to x="+flash_x+" y="+flash_y);
+	
+}
 //Following part is for volume detection
 
 function didntGetStream() {

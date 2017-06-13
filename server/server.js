@@ -204,6 +204,10 @@ game_socket.on('connection', function(socket){
 				player_position[socket.id].x = randx*block_size;
 				player_position[socket.id].y = randy*block_size;
 				break;
+			case 4:
+				player_position[socket.id].x = data.x;
+				player_position[socket.id].y = data.y;
+				break;
 		}
 	});
 
