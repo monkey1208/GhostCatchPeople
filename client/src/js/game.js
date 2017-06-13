@@ -481,7 +481,7 @@ function flash(){
 	}
 
     }
-    //console.log("flash to x="+flash_x+" y="+flash_y);
+    console.log("flash to x="+flash_x+" y="+flash_y);
 
 }
 //Following part is for volume detection
