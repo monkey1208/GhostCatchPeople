@@ -6,6 +6,8 @@ var io = require('socket.io')(server);
 
 var map_width = 1000;
 var map_height = 500;
+var map_max_width = 2000;
+var map_max_height = 1000;
 
 server.listen(process.env.PORT || 8000);
 //io.listen(server);
@@ -39,6 +41,7 @@ game_socket.on('connection', function(socket){
 	socket.id = Math.random();
 	socket.x = Math.floor((Math.random()*map_width)+500);
 	socket.y = Math.floor((Math.random()*map_height)+250);
+	socket.skill = 0;
 	var isGhost = true;
 	if(ghost_num > people_num){
 		isGhost = false;
@@ -46,7 +49,7 @@ game_socket.on('connection', function(socket){
 	}else
 		ghost_num ++;
 	socket.isGhost = isGhost;
-	var position = {x:socket.x, y:socket.y, isGhost:isGhost};
+	var position = {x:socket.x, y:socket.y, isGhost:isGhost, skill:socket.skill};
 	player_position[socket.id] = position;
 	socket_list[socket.id] = socket;
 	socket.emit('init', {x:socket.x, y:socket.y, isGhost:isGhost, id:socket.id});
@@ -59,8 +62,19 @@ game_socket.on('connection', function(socket){
 		delete player_position[socket.id];
 	});
 	socket.on('newPosition', function(data, fn){
-		player_position[socket.id].x = data.x;
-		player_position[socket.id].y = data.y;
+		//console.log("x = "+data.x+" y = "+data.y);
+		if(data.x < 0)
+			player_position[socket.id].x = 0;
+		else if(data.x > map_max_width)
+			player_position[socket.id].x = map_max_width;
+		else
+			player_position[socket.id].x = data.x;
+		if(data.y < 0)
+			player_position[socket.id].y = 0;
+		else if(data.y > map_max_height)
+			player_position[socket.id].y = map_max_height;
+		else
+			player_position[socket.id].y = data.y;
 	});
 	socket.on('gameover', function(){
 		if(player_position[socket.id].isGhost)
@@ -68,7 +82,7 @@ game_socket.on('connection', function(socket){
 		else
 			people_num --;
 		delete socket_list[socket.id];
-      delete player_position[socket.id];
+     		delete player_position[socket.id];
 
 	});
 	socket.on('restart', function(){	
@@ -81,6 +95,23 @@ game_socket.on('connection', function(socket){
 			ghost_num ++;
 		position = {x:socket.x, y:socket.y, isGhost:isGhost};
 		player_position[socket.id] = position;
+	});
+	socket.on('skill', function(data){
+		var skill = data.skill;
+		switch(skill){
+			case 1:
+				break;
+			case 2:
+				player_position[socket.id].skill = 2;
+				setTimeout(function(){
+					player_position[socket.id].skill = 0;},
+					3000, '3sec boost!');
+				break;
+			case 3:
+				player_position[socket.id].x = Math.floor((Math.random()*(map_max_width-500))+500);
+				player_position[socket.id].y = Math.floor((Math.random()*(map_max_height-250))+250);
+				break;
+		}
 	});
 
    /* TODO */
@@ -101,7 +132,8 @@ setInterval(function(){
 			id:socket.id,
 			x:player_position[socket.id].x,
 			y:player_position[socket.id].y,
-			isGhost:socket.isGhost
+			isGhost:socket.isGhost,
+			skill:socket.skill
 		});
 	}
 	for (var i in socket_list){
@@ -109,5 +141,3 @@ setInterval(function(){
 		socket.emit('newPosition', pack);
 	}
 }, 1000/15);
-
-
