@@ -5,7 +5,7 @@ var MAX_ENERGY = 100
 var Q_COST_ENERGY = 20
 var W_COST_ENERGY = 30
 var E_COST_ENERGY = 60
-var R_COST_ENERGY = 40
+var R_COST_ENERGY = 50
 var R_DISTANCE = 180
 
 // Displaying Constansts
@@ -33,7 +33,7 @@ var energy = 0;
 var width, height;
 var speed = 30;
 var block_size = 100;
-var game_map;
+var game_map = null;
 var me;
 var lastkey = 0;
 
@@ -46,7 +46,8 @@ var energy_canvasContext = null;
 
 window.onload = function(){
 	var box = document.getElementById("box");
-    var ctx = box.getContext("2d");
+   var ctx = box.getContext("2d");
+   ctx.clearRect(0, 0, 1000, 500);
 	var Img = {};
 	Img.ghost = new Image();
 	Img.ghost.src = "src/img/ghost.jpg";
@@ -60,6 +61,10 @@ window.onload = function(){
 	Img.wall2.src = "src/img/wall2.png";
 	Img.wall3 = new Image();
 	Img.wall3.src = "src/img/wall3.png";
+	Img.explo1 = new Image();
+	Img.explo1.src = "src/img/explo1.png";
+	Img.bomb = new Image();
+	Img.bomb.src = "src/img/bomb.png";
    width = $(window).width();
     height = $(window).height();
 
@@ -92,7 +97,7 @@ window.onload = function(){
     /*Section ends */
 
    socket.on('init', function(data){
-	   game_map = data.game_map
+      game_map = data.game_map
 	   for(var i = 0; i < 11; i ++){
 		   for(var j = 0; j < 21; j ++){
 			   for(var k = 0; k<block_size; k ++){
@@ -108,6 +113,7 @@ window.onload = function(){
 		isGhost = data.isGhost;
 		if(isGhost){
 			me = Img.ghost;
+
       setInterval(function(){
         energy += GHOST_ENERGY_RECOVER_PER_SECOND;
         if (energy > MAX_ENERGY){
@@ -117,6 +123,7 @@ window.onload = function(){
       }, 1000);
     }else{
 			me = Img.human;
+      energy = MAX_ENERGY;
 		  setInterval(function(){
 		    energy += HUMAN_ENERGY_RECOVER_PER_SECOND;
         if (energy > MAX_ENERGY){
@@ -287,6 +294,50 @@ window.onload = function(){
 			   }
  		   }
  	    }
+
+		for (var j in danger_pos) {
+			expx = danger_pos[j].x;
+			expy = danger_pos[j].y;
+			if(expx >= x_edge1 - 50 && expx <= x_edge2 &&
+			   expy >= y_edge1 - 50 && expy <= y_edge2 ){
+				var correct_expx = expx - x_edge1, correct_expy = expy - y_edge1;
+   				var img_sel_x = 0, img_sel_y = 0;
+   				if (correct_expx<0){
+   					img_sel_x = (x_edge1 - expx)/50;
+   					correct_wallx=0;
+   				}
+   				if (correct_expy<0){
+   					img_sel_y = (y_edge1 - expy)/50;
+   					correct_wally=0;
+   				}
+				ctx.drawImage(Img.bomb, img_sel_x*Img.bomb.width, img_sel_y*Img.bomb.height,
+							  Img.bomb.width, Img.bomb.height, correct_expx,
+							  correct_expy, 50, 50);
+
+		    }
+        }
+		for (var j in explode_pos) {
+			expx = explode_pos[j].x;
+			expy = explode_pos[j].y;
+			if(expx >= x_edge1 - 50 && expx <= x_edge2 &&
+			   expy >= y_edge1 - 50 && expy <= y_edge2 ){
+				var correct_expx = expx - x_edge1, correct_expy = expy - y_edge1;
+   				var img_sel_x = 0, img_sel_y = 0;
+   				if (correct_expx<0){
+   					img_sel_x = (x_edge1 - expx)/150;
+   					correct_wallx=0;
+   				}
+   				if (correct_expy<0){
+   					img_sel_y = (y_edge1 - expy)/150;
+   					correct_wally=0;
+   				}
+				ctx.drawImage(Img.explo1, img_sel_x*Img.explo1.width, img_sel_y*Img.explo1.height,
+							  Img.explo1.width, Img.explo1.height, correct_expx-50,
+							  correct_expy-50, 150, 150);
+
+		    }
+        }
+
 		var imgData = ctx.getImageData(0, 0, 1000, 500);
 		var img = imgData.data;
         for(var i = 0; i < img.length; i += 4){
@@ -294,6 +345,7 @@ window.onload = function(){
             mx = x_edge1+(i/4)%1000;
 
 			// Draw explosion
+			/*
             for (var j in danger_pos) {
                 exp_x = danger_pos[j].x;
                 exp_y = danger_pos[j].y;
@@ -304,19 +356,23 @@ window.onload = function(){
                     img[i+3] = 255;
                 }
             }
+			*/
             for (var j in explode_pos) {
                 exp_x = explode_pos[j].x;
                 exp_y = explode_pos[j].y;
                 if (inExplodeRange(mx, my, exp_x, exp_y)) {
+					/*
                     img[i] = 255;
                     img[i+1] = 0;
                     img[i+2] = 0;
                     img[i+3] = 255;
+					*/
                 }
                 if (inExplodeRange2(x, y, exp_x, exp_y)) dead = 1;
             }
         }
         ctx.putImageData(imgData, 0, 0);
+
 		if(now_skill != 2) ctx.drawImage(me, 0, 0, me.width, me.height, x_mypos, y_mypos, 50, 50);
 		else{
 		    if(isGhost) ctx.drawImage(Img.human, 0, 0, Img.human.width, Img.human.height, x_mypos, y_mypos, 50, 50);
@@ -411,7 +467,7 @@ function flash(){
 		break;
 	    }
 	}
-	
+
     }else{
 	for(var i = R_DISTANCE; i >= 0; i--){
 	    if(current_y+i+50>=map_height)
@@ -422,10 +478,10 @@ function flash(){
 		break;
 	    }
 	}
-        
+
     }
     //console.log("flash to x="+flash_x+" y="+flash_y);
-	
+
 }
 //Following part is for volume detection
 // Reference : https://github.com/cwilso/volume-meter
