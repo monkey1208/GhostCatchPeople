@@ -14,7 +14,7 @@ var WIDTH=500;
 var HEIGHT=50;
 var ENERGY_COLOR = '#EEEE00'
 
-var server_ip = 'localhost'
+var server_ip = '10.5.5.29'
 var socket = io('//'+server_ip+':8000/game');
 
 var map_width = 2100;

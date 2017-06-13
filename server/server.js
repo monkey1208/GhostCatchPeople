@@ -117,12 +117,12 @@ game_socket.on('connection', function(socket){
 	socket.x = randx*block_size;
 	socket.y = randy*block_size;
 	socket.skill = 0;
-	var isGhost = true;
-	if(ghost_num > people_num){
-		isGhost = false;
-		people_num ++;
-	}else
+	var isGhost = false;
+	if(ghost_num < people_num){
+		isGhost = true;
 		ghost_num ++;
+	}else
+		people_num ++;
 	socket.isGhost = isGhost;
 	var position = {x:socket.x, y:socket.y, isGhost:isGhost, skill:socket.skill};
 	player_position[socket.id] = position;
