@@ -31,13 +31,13 @@ window.onload = function(){
 	Img.human = new Image();
 	Img.human.src = "src/img/human.jpg";
 	Img.floor = new Image();
-	Img.floor.src = "src/img/floor.jpg";
+	Img.floor.src = "src/img/floor.png";
 	Img.wall1 = new Image();
-	Img.wall1.src = "src/img/wall1.jpg";
+	Img.wall1.src = "src/img/wall1.png";
 	Img.wall2 = new Image();
-	Img.wall2.src = "src/img/wall2.jpg";
+	Img.wall2.src = "src/img/wall2.png";
 	Img.wall3 = new Image();
-	Img.wall3.src = "src/img/wall3.jpg";
+	Img.wall3.src = "src/img/wall3.png";
    width = $(window).width();
     height = $(window).height();
 
@@ -91,23 +91,6 @@ window.onload = function(){
 		    $("#scoreboard").text(score);
 		 }, 1000);
 		}
-
-      getPosition(x, y);
-		ctx.clearRect(0, 0, 1000, 500);
-      var imgData = ctx.getImageData(0, 0, 1000, 500);
-		var img = imgData.data;
-      for(var i = 0; i < img.length; i += 4){
-          my = y_edge1+Math.floor((i/4)/1000);
-          mx = x_edge1+(i/4)%1000;
-         if(map_init[my][mx]>=0.7){ // map_init[??] >= 0.7
-            img[i+3] = 255;
-         }
-         else{
-            img[i+3] = 0;
-         }
-      }
-      ctx.putImageData(imgData, 0, 0);
-      ctx.drawImage(me, 0, 0, me.width, me.height, x_mypos, y_mypos, 50, 50);
 		console.log("init success!");
 	});
 	console.log('test');
@@ -199,17 +182,53 @@ window.onload = function(){
 		}
         getPosition(x, y);
         dead = 0;
+
+		// Draw walls and floor
+		for(var i = 0; i < 11; i ++){
+ 		   for(var j = 0; j < 21; j ++){
+			   var wallx = j*block_size, wally = i*block_size;
+			   if(wallx >= x_edge1 - block_size && wallx <= x_edge2 &&
+				  wally >= y_edge1 - block_size && wally <= y_edge2 ){
+				   var correct_wallx = wallx - x_edge1, correct_wally = wally - y_edge1;
+				   var img_sel_x = 0, img_sel_y = 0;
+				   if (correct_wallx<0){
+					   img_sel_x = (x_edge1 - wallx)/100;
+					   correct_wallx=0;
+				   }
+				   if (correct_wally<0){
+					   img_sel_y = (y_edge1 - wally)/100;
+					   correct_wally=0;
+				   }
+	 			   switch (game_map[i][j]){
+					   case 0:
+					   	ctx.drawImage(Img.floor, img_sel_x*Img.floor.width, img_sel_y*Img.floor.height,
+									  Img.floor.width, Img.floor.height, correct_wallx,
+									  correct_wally, block_size, block_size);
+					   	break;
+					   case 1:
+					   	ctx.drawImage(Img.wall1, img_sel_x*Img.wall1.width, img_sel_y*Img.wall1.height,
+									  Img.wall1.width, Img.wall1.height, correct_wallx,
+									  correct_wally, block_size, block_size);
+					   	break;
+					   case 2:
+					    ctx.drawImage(Img.wall2, img_sel_x*Img.wall2.width, img_sel_y*Img.wall2.height,
+									  Img.wall2.width, Img.wall2.height, correct_wallx,
+								   	  correct_wally, block_size, block_size);
+					    break;
+					   case 3:
+	  				   	ctx.drawImage(Img.wall3, img_sel_x*Img.wall3.width, img_sel_y*Img.wall3.height,
+									  Img.wall3.width, Img.wall3.height, correct_wallx,
+	  								  correct_wally, block_size, block_size);
+	  				   	break;
+				   }
+			   }
+ 		   }
+ 	    }
         for(var i = 0; i < img.length; i += 4){
             my = y_edge1+Math.floor((i/4)/1000);
             mx = x_edge1+(i/4)%1000;
-            if(map_init[my][mx]>=0.7){ // map_init[??] >= 0.7
-                img[i] = 0;
-                img[i+1] = 0;
-                img[i+2] = 0;
-                img[i+3] = 255;
-            } else {
-                img[i+3] = 0;
-            }
+
+			// Draw explosion
             for (var j in danger_pos) {
                 exp_x = danger_pos[j].x;
                 exp_y = danger_pos[j].y;
@@ -232,7 +251,7 @@ window.onload = function(){
                 if (inExplodeRange2(x, y, exp_x, exp_y)) dead = 1;
             }
         }
-        ctx.putImageData(imgData, 0, 0);
+        // ctx.putImageData(imgData, 0, 0);
         ctx.drawImage(me, 0, 0, me.width, me.height, x_mypos, y_mypos, 50, 50);
         if (dead) {
             socket.disconnect();
@@ -363,7 +382,7 @@ function getPosition(x, y){
 
    if(x <= 500){
       x_edge1 = 0;
-      x_edge_2 = 1000;
+      x_edge2 = 1000;
       x_mypos = x;
    }
    else if(x >= map_width- 500){

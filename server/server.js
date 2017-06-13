@@ -196,12 +196,12 @@ game_socket.on('connection', function(socket){
 				break;
 			case 3:
 				var randx = Math.floor((Math.random()*width)), randy = Math.floor((Math.random()*height));
-				while(map[randy][randx]==1){
+				while(map[randy][randx]>=1){
 					randx = Math.floor((Math.random()*width));
 					randy = Math.floor((Math.random()*height));
 				}
-				player_position[socket.id].x = randx*50;
-				player_position[socket.id].y = randy*50;
+				player_position[socket.id].x = randx*block_size;
+				player_position[socket.id].y = randy*block_size;
 				break;
 		}
 	});
