@@ -5,7 +5,7 @@ var MAX_ENERGY = 100
 var Q_COST_ENERGY = 20
 var W_COST_ENERGY = 30
 var E_COST_ENERGY = 60
-var R_COST_ENERGY = 40
+var R_COST_ENERGY = 50
 var R_DISTANCE = 180
 
 // Displaying Constansts
@@ -108,6 +108,7 @@ window.onload = function(){
 		isGhost = data.isGhost;
 		if(isGhost){
 			me = Img.ghost;
+
       setInterval(function(){
         energy += GHOST_ENERGY_RECOVER_PER_SECOND;
         if (energy > MAX_ENERGY){
@@ -117,6 +118,7 @@ window.onload = function(){
       }, 1000);
     }else{
 			me = Img.human;
+      energy = MAX_ENERGY;
 		  setInterval(function(){
 		    energy += HUMAN_ENERGY_RECOVER_PER_SECOND;
         if (energy > MAX_ENERGY){
