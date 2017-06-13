@@ -1,3 +1,5 @@
+// Volume detection ref: https://github.com/cwilso/volume-meter/
+
 var socket = io('//localhost:8000/game');
 var map_init = new Array(1000);
 /* TODO */
@@ -55,6 +57,7 @@ window.onload = function(){
         console.log("getUserMedia not supported");
         alert('getUserMedia threw exception :' + e);
     }
+
     /*Section ends */
    
    socket.on('init', function(data){
@@ -226,7 +229,12 @@ window.onload = function(){
       /* TODO */
       /* continually read incoming volume and tell if it is a skill, 
        * volume --> affect speed, */
-       console.log("Current volume "+meter.volume);
+       if(meter == null){
+           console.log("mic unable now.");
+       }
+       else{
+       	console.log("Current volume "+meter.volume);
+       }
 	});
 }
 
