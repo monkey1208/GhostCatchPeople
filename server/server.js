@@ -36,8 +36,9 @@ var people_num = 0;
 var game_socket = io.of('/game');
 
 // Map Generation
-var maze_width = 20;
-var maze_height = 10;
+var block_size = 100
+var maze_width = 10;
+var maze_height = 5;
 var moves = [];
 var width = 2*maze_width+1;
 var height = 2*maze_height+1;
@@ -47,7 +48,7 @@ for(var i = 0; i < height; i ++){
 }
 for(var i = 0; i < height; i ++){
 	for(var j = 0; j < width; j ++){
-		map[i][j] = 1;
+		map[i][j] = Math.floor((Math.random()*3))+1;
 	}
 }
 
@@ -57,16 +58,16 @@ map[x_pos][y_pos] = 0;
 moves.push(y_pos+(x_pos*width));
 while(moves.length>0){
     var possible_directions = "";
-    if(x_pos+2 > 0 && x_pos+2 <= height-1 && map[x_pos+2][y_pos] == 1){
+    if(x_pos+2 > 0 && x_pos+2 <= height-1 && map[x_pos+2][y_pos] >= 1){
         possible_directions += "S";
 	}
-    if(x_pos-2 > 0 && x_pos-2 <= height-1 && map[x_pos-2][y_pos] == 1){
+    if(x_pos-2 > 0 && x_pos-2 <= height-1 && map[x_pos-2][y_pos] >= 1){
         possible_directions += "N";
     }
-	if(y_pos-2 > 0 && y_pos-2 <= width-1 && map[x_pos][y_pos-2] == 1){
+	if(y_pos-2 > 0 && y_pos-2 <= width-1 && map[x_pos][y_pos-2] >= 1){
         possible_directions += "W";
 	}
-	if(y_pos+2 > 0 && y_pos+2 <= width-1 && map[x_pos][y_pos+2] == 1){
+	if(y_pos+2 > 0 && y_pos+2 <= width-1 && map[x_pos][y_pos+2] >= 1){
         possible_directions += "E";
 	}
     if(possible_directions != ""){
@@ -105,12 +106,12 @@ game_socket.on('connection', function(socket){
 	console.log("game connected");
 	socket.id = Math.random();
 	var randx = Math.floor((Math.random()*width)), randy = Math.floor((Math.random()*height));
-	while(map[randy][randx]==1){
+	while(map[randy][randx]>=1){
 		randx = Math.floor((Math.random()*width));
 		randy = Math.floor((Math.random()*height));
 	}
-	socket.x = randx*50;
-	socket.y = randy*50;
+	socket.x = randx*block_size;
+	socket.y = randy*block_size;
 	socket.skill = 0;
 	var isGhost = true;
 	if(ghost_num > people_num){
@@ -156,8 +157,13 @@ game_socket.on('connection', function(socket){
 
 	});
 	socket.on('restart', function(){
-		socket.x = Math.floor((Math.random()*1000)+500);
-		socket.y = Math.floor((Math.random()*500)+250);
+		var randx = Math.floor((Math.random()*width)), randy = Math.floor((Math.random()*height));
+		while(map[randy][randx]>=1){
+			randx = Math.floor((Math.random()*width));
+			randy = Math.floor((Math.random()*height));
+		}
+		socket.x = randx*block_size;
+		socket.y = randy*block_size;
 		if(ghost_num > people_num){
 			isGhost = false;
 			people_num ++;
@@ -194,7 +200,7 @@ game_socket.on('connection', function(socket){
 					randx = Math.floor((Math.random()*width));
 					randy = Math.floor((Math.random()*height));
 				}
-				player_position[socket.id].x = randx*50; 
+				player_position[socket.id].x = randx*50;
 				player_position[socket.id].y = randy*50;
 				break;
 		}

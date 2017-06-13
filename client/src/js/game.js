@@ -1,7 +1,7 @@
 var socket = io('//localhost:8000/game');
 
-var map_width = 2050;
-var map_height = 1050;
+var map_width = 2100;
+var map_height = 1100;
 var map_init = new Array(map_height);
 for(var i = 0; i < map_height; i ++){
     map_init[i] = new Array(map_width);
@@ -15,7 +15,7 @@ var id, isGhost;
 var score = 0;
 var width, height;
 var speed = 30;
-var block_size = 50;
+var block_size = 100;
 var game_map;
 var me;
 
@@ -30,7 +30,15 @@ window.onload = function(){
 	Img.ghost.src = "src/img/ghost.jpg";
 	Img.human = new Image();
 	Img.human.src = "src/img/human.jpg";
-    width = $(window).width();
+	Img.floor = new Image();
+	Img.floor.src = "src/img/floor.jpg";
+	Img.wall1 = new Image();
+	Img.wall1.src = "src/img/wall1.jpg";
+	Img.wall2 = new Image();
+	Img.wall2.src = "src/img/wall2.jpg";
+	Img.wall3 = new Image();
+	Img.wall3.src = "src/img/wall3.jpg";
+   width = $(window).width();
     height = $(window).height();
 
     /*This section is for volume recognizing */
@@ -61,8 +69,8 @@ window.onload = function(){
 
    socket.on('init', function(data){
 	   game_map = data.game_map
-	   for(var i = 0; i < 21; i ++){
-		   for(var j = 0; j < 41; j ++){
+	   for(var i = 0; i < 11; i ++){
+		   for(var j = 0; j < 21; j ++){
 			   for(var k = 0; k<block_size; k ++){
 				   for(var l = 0; l<block_size; l ++){
 					   map_init[i*block_size+k][j*block_size+l] = game_map[i][j]
@@ -108,30 +116,30 @@ window.onload = function(){
         //ctx.clearRect(0, 0, 1000, 500);
         var update_pos = true;
         var skill = 0;
-        //var speed = 50;
-        var oldX = x, oldY = y;
-        switch(e.keyCode){
-            case 37:
-                if(x >= 50){ //505
-                    x -= speed;
-                }
-                break;
-            case 38:
-                if(y >= 50){ //255
-                    y -= speed;
-                }
-                break;
-            case 39:
-                if(x <= 2000){ //1495
-                    x += speed;
-                }
-                break;
-            case 40:
-                if(y <= 1000){ //745
-                    y += speed;
-                }
-                break;
-            case 81: // q
+		//var speed = 50;
+		var oldX = x, oldY = y;
+		switch(e.keyCode){
+			case 37:
+				if(x >= block_size){ //505
+					x -= speed;
+				}
+				break;
+			case 38:
+				if(y >= block_size){ //255
+					y -= speed;
+				}
+				break;
+			case 39:
+				if(x <= map_width - block_size){ //1495
+					x += speed;
+				}
+				break;
+			case 40:
+				if(y <= map_height - block_size){ //745
+					y += speed;
+				}
+				break;
+			case 81: // q
                 skill = 1;
                 update_pos = false;
                 break;
@@ -146,8 +154,8 @@ window.onload = function(){
 		}
 		if(update_pos){
 			// Collision with wall
-			while(map_init[y][x]>0 || map_init[y+block_size-1][x+block_size-1]>0 ||
-				  map_init[y+block_size-1][x]>0 || map_init[y][x+block_size-1]>0){
+			while(map_init[y][x]>0 || map_init[y+50-1][x+50-1]>0 ||
+				  map_init[y+50-1][x]>0 || map_init[y][x+50-1]>0){
 				if(x > oldX){
 					x--;
 				}else if(x < oldX){
@@ -231,7 +239,7 @@ window.onload = function(){
             document.location.href = "/";
         }
         for(var i in player_position){
-            if(player_position[i].x > x_edge1 && player_position[i].x < x_edge2 
+            if(player_position[i].x > x_edge1 && player_position[i].x < x_edge2
                && player_position[i].y > y_edge1 && player_position[i].y < y_edge2){
                 if(player_position[i].isGhost)
                     ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, player_position[i].x - x_edge1, player_position[i].y - y_edge1, 50, 50);
@@ -358,20 +366,20 @@ function getPosition(x, y){
       x_edge_2 = 1000;
       x_mypos = x;
    }
-   else if(x >= 1550){
-      x_edge1 = 1050;
-      x_edge2 = 2050;
-      x_mypos = 500 + (x - 1550);
+   else if(x >= map_width- 500){
+      x_edge1 = map_width-1000;
+      x_edge2 = map_width;
+      x_mypos = 500 + (x - (map_width - 500));
    }
    if(y <= 250){
       y_edge1 = 0;
       y_edge2 = 500;
       y_mypos = y;
    }
-   else if(y >= 800){
-      y_edge1 = 550;
-      y_edge2 = 1050;
-      y_mypos = 250 + (y - 800);
+   else if(y >= map_height - 250){
+      y_edge1 = map_height - 500;
+      y_edge2 = map_height;
+      y_mypos = 250 + (y - (map_height - 250));
    }
 }
 
