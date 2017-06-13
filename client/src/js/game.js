@@ -23,6 +23,8 @@ var mediaStreamSource = null;
 var meter = null;
 
 window.onload = function(){
+	var box = document.getElementById("box");
+   var ctx = box.getContext("2d");
 	var Img = {};
 	Img.ghost = new Image();
 	Img.ghost.src = "src/img/ghost.jpg";
@@ -81,12 +83,25 @@ window.onload = function(){
 		    $("#scoreboard").text(score);
 		 }, 1000);
 		}
+
+      getPosition(x, y);
+		ctx.clearRect(0, 0, 1000, 500);
+      var imgData = ctx.getImageData(0, 0, 1000, 500);
+		var img = imgData.data;
+      for(var i = 0; i < img.length; i += 4){
+          my = y_edge1+Math.floor((i/4)/1000);
+          mx = x_edge1+(i/4)%1000;
+         if(map_init[my][mx]>=0.7){ // map_init[??] >= 0.7
+            img[i+3] = 255;
+         }
+         else{
+            img[i+3] = 0;
+         }
+      }
+      ctx.putImageData(imgData, 0, 0);
+      ctx.drawImage(me, 0, 0, me.width, me.height, x_mypos, y_mypos, 50, 50);
 		console.log("init success!");
 	});
-	var box = document.getElementById("box");
-	//box.style.width = width;
-   //box.style.height = height;
-   var ctx = box.getContext("2d");
 	console.log('test');
 
 	window.onkeydown = function(e){
@@ -147,9 +162,9 @@ window.onload = function(){
 		}
 	}
 	socket.on('newPosition', function(d){
+		ctx.clearRect(0, 0, 1000, 500);
 		var imgData = ctx.getImageData(0, 0, 1000, 500);
 		var img = imgData.data;
-		ctx.clearRect(0, 0, 1000, 500);
 		var player_position = {};
 		
 		var data = d.pack;
