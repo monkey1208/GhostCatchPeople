@@ -30,6 +30,10 @@ app.get('/game', function(req, res){
 	res.sendFile(path.join(__dirname, '../', 'client', 'game.html'));
 	console.log("join game");
 });
+app.get('/monitor', function(req, res){
+	res.sendFile(path.join(__dirname, '../', 'client', 'monitor.html'));
+	console.log("monitor");
+});
 
 var socket_list = {};
 var player_position = {};
@@ -38,6 +42,7 @@ var explode_position = {};
 var ghost_num = 0;
 var people_num = 0;
 var game_socket = io.of('/game');
+var monitor_socket = io.of('/monitor');
 
 // Map Generation
 var block_size = 100
@@ -225,6 +230,11 @@ game_socket.on('connection', function(socket){
 	}
 });
 
+monitor_socket.on('connection', function(socket){
+	console.log("monitor connect");
+	socket.emit('init', {game_map:map});
+});
+
 setInterval(function(){
 	var pack = [];
 	for (var i in socket_list){
@@ -241,4 +251,5 @@ setInterval(function(){
 		var socket = socket_list[i];
 		socket.emit('newPosition', {pack:pack, danger_pos:danger_position, explode_pos:explode_position});
 	}
+	monitor_socket.emit('newPosition', {pack:pack, danger_pos:danger_position, explode_pos:explode_position});
 }, 1000/15);
