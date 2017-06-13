@@ -1,3 +1,7 @@
+// Game setting
+var BOMB_TIMER = 2000
+var W_TIMER = 5000
+
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);
@@ -186,14 +190,14 @@ game_socket.on('connection', function(socket){
 						delete explode_position[danger_id];
 						}, 1000, 'explode');
 					},
-					5000, 'danger -> explode');
+					BOMB_TIMER, 'danger -> explode');
 				break;
 			case 2:
 				player_position[socket.id].skill = 2;
 				setTimeout(function(){
 					if(player_position[socket.id] != undefined)
 						player_position[socket.id].skill = 0;},
-					3000, '3sec boost!');
+					W_TIMER, '3sec boost!');
 				break;
 			case 3:
 				var randx = Math.floor((Math.random()*width)), randy = Math.floor((Math.random()*height));

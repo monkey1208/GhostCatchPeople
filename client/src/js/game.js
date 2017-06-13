@@ -1,10 +1,11 @@
 // Game Constants Setting
 var GHOST_ENERGY_RECOVER_PER_SECOND = 5
 var HUMAN_ENERGY_RECOVER_PER_SECOND = 10
+var HUMAN_ENERGY_INIT = 50
 var MAX_ENERGY = 100
 var Q_COST_ENERGY = 20
 var W_COST_ENERGY = 30
-var E_COST_ENERGY = 60
+var E_COST_ENERGY = 70
 var R_COST_ENERGY = 50
 var R_DISTANCE = 180
 
@@ -123,7 +124,7 @@ window.onload = function(){
       }, 1000);
     }else{
 			me = Img.human;
-      energy = MAX_ENERGY;
+      energy = HUMAN_ENERGY_INIT;
 		  setInterval(function(){
 		    energy += HUMAN_ENERGY_RECOVER_PER_SECOND;
         if (energy > MAX_ENERGY){
