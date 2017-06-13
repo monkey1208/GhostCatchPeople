@@ -147,9 +147,18 @@ window.onload = function(){
 		}
 		if(update_pos){
 			// Collision with wall
-			if(map_init[y][x]>0 || map_init[y+block_size-1][x+block_size-1]>0){
-				x = oldX;
-				y = oldY;
+			while(map_init[y][x]>0 || map_init[y+block_size-1][x+block_size-1]>0 ||
+				  map_init[y+block_size-1][x]>0 || map_init[y][x+block_size-1]>0){
+				if(x > oldX){
+					x--;
+				}else if(x < oldX){
+					x++;
+				}
+				if(y > oldY){
+					y--;
+				}else if(y <oldY){
+					y++;
+				}
 			}
 			socket.emit('newPosition', {x: x, y: y}, function(data){
 			});
@@ -166,7 +175,7 @@ window.onload = function(){
 		var imgData = ctx.getImageData(0, 0, 1000, 500);
 		var img = imgData.data;
 		var player_position = {};
-		
+
 		var data = d.pack;
 		var danger_pos = d.danger_pos;
         	//console.log(danger_pos);
@@ -181,7 +190,7 @@ window.onload = function(){
 				player_position[data[i].id] = position;
          }
 		}
-      getPosition(x, y); 
+      getPosition(x, y);
       for(var i = 0; i < img.length; i += 4){
           my = y_edge1+Math.floor((i/4)/1000);
           mx = x_edge1+(i/4)%1000;
@@ -196,7 +205,7 @@ window.onload = function(){
       ctx.drawImage(me, 0, 0, me.width, me.height, x_mypos, y_mypos, 50, 50);
 
 		for(var i in player_position){
-			if(player_position[i].x > x_edge1 && player_position[i].x < x_edge2 
+			if(player_position[i].x > x_edge1 && player_position[i].x < x_edge2
             && player_position[i].y > y_edge1 && player_position[i].y < y_edge2){
 				if(player_position[i].isGhost)
 					ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, player_position[i].x - x_edge1, player_position[i].y - y_edge1, 50, 50);
@@ -224,7 +233,7 @@ window.onload = function(){
        else{
        	speed = 5+Math.floor(40*meter.volume);
        }
-       
+
 	});
 }
 
