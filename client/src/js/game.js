@@ -316,7 +316,7 @@ function isCollide(rect1, x, y) {
 }
 
 //Following part is for volume detection
-
+// Reference : https://github.com/cwilso/volume-meter
 function didntGetStream() {
     console.log('Stream generation failed.');
     alert('Stream generation failed.');
