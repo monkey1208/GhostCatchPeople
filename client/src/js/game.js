@@ -12,9 +12,9 @@ var R_DISTANCE = 180
 // Displaying Constansts
 var WIDTH=500;
 var HEIGHT=50;
-var ENERGY_COLOR = '#EEEE00'
+var ENERGY_COLOR = '#FF6666';
 
-var server_ip = '10.5.5.29'
+var server_ip = 'localhost';
 var socket = io('//'+server_ip+':8000/game');
 
 var map_width = 2100;
@@ -415,9 +415,9 @@ window.onload = function(){
        else{
            speed_canvasContext.clearRect(0,0,WIDTH,HEIGHT);
            if (meter.checkClipping())
-            speed_canvasContext.fillStyle = "red";
+            speed_canvasContext.fillStyle = "#FFB366";
            else
-            speed_canvasContext.fillStyle = "green";
+            speed_canvasContext.fillStyle = "#2F6844";
            speed = 5+Math.floor(40*meter.volume);
            speed_canvasContext.fillRect(0, 0, speed*WIDTH/45, HEIGHT);
            $("#speedboard").text(speed);
@@ -436,13 +436,13 @@ function isCollide(rect1, x, y) {
 function flash(){
     var current_x = x;
     var current_y = y;
-    //console.log("current x="+current_x+" y="+current_y);
+    console.log("current x="+current_x+" y="+current_y);
     if(lastkey == 1){
 	for(var i = R_DISTANCE; i >= 0; i--){
-	    //console.log("left = "+map_init[current_y][current_x-i]+" right = "+map_init[current_y][current_x-i+50]);
+	    //console.log("left = "+map_init[current_y][current_x-i]+" right = "+map_init[current_y][current_x-i+50]+" left down = "+map_init[current_y+50][current_x-i]+" right down = "+map_init[current_y+50][current_x-i+50]);
 	    if(current_x-i<0)
 		continue;
-	    if(map_init[current_y][current_x-i] == 0 && map_init[current_y][current_x-i+50] == 0 && map_init[current_y+50][current_x-i] == 0 && map_init[current_y+50][current_x-i+50] == 0){
+	    if(map_init[current_y][current_x-i] == 0 && map_init[current_y][current_x-i+49] == 0 && map_init[current_y+49][current_x-i] == 0 && map_init[current_y+49][current_x-i+49] == 0){
 		flash_x = current_x - i;
 		flash_y = current_y;
 		break;
@@ -452,7 +452,7 @@ function flash(){
 	for(var i = R_DISTANCE; i >= 0; i--){
 	    if(current_y-i<0)
 		continue;
-	    if(map_init[current_y-i][current_x] == 0 && map_init[current_y-i+50][current_x] == 0 && map_init[current_y-i+50][current_x+50] == 0 && map_init[current_y-i][current_x+50] == 0){
+	    if(map_init[current_y-i][current_x] == 0 && map_init[current_y-i+49][current_x] == 0 && map_init[current_y-i+49][current_x+49] == 0 && map_init[current_y-i][current_x+49] == 0){
 		flash_x = current_x;
 		flash_y = current_y - i;
 		break;
@@ -462,7 +462,7 @@ function flash(){
 	for(var i = R_DISTANCE; i >= 0; i--){
 	    if(current_x+i+50>=map_width)
 		continue;
-	    if(map_init[current_y][current_x+i] == 0 && map_init[current_y][current_x+i+50] == 0 && map_init[current_y+50][current_x+i] == 0 && map_init[current_y+50][current_x+i+50] == 0){
+	    if(map_init[current_y][current_x+i] == 0 && map_init[current_y][current_x+i+49] == 0 && map_init[current_y+49][current_x+i] == 0 && map_init[current_y+49][current_x+i+49] == 0){
 		flash_x = current_x + i;
 		flash_y = current_y;
 		break;
@@ -473,7 +473,7 @@ function flash(){
 	for(var i = R_DISTANCE; i >= 0; i--){
 	    if(current_y+i+50>=map_height)
 		continue;
-	    if(map_init[current_y+i][current_x] == 0 && map_init[current_y+i+50][current_x] == 0 && map_init[current_y+i+50][current_x+50] == 0 && map_init[current_y+i][current_x+50] == 0){
+	    if(map_init[current_y+i][current_x] == 0 && map_init[current_y+i+49][current_x] == 0 && map_init[current_y+i+49][current_x+49] == 0 && map_init[current_y+i][current_x+49] == 0){
 		flash_x = current_x;
 		flash_y = current_y + i;
 		break;
@@ -601,5 +601,5 @@ function update_energy_display(){
     $("#energyboard").text(energy);
     energy_canvasContext.clearRect(0,0,WIDTH,HEIGHT);
     energy_canvasContext.fillStyle = ENERGY_COLOR;
-    energy_canvasContext.fillRect(0, 0, energy*WIDTH/100, HEIGHT);
+    energy_canvasContext.fillRect(0, 0, energy*WIDTH/170, HEIGHT);
 }
