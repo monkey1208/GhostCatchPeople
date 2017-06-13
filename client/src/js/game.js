@@ -601,5 +601,5 @@ function update_energy_display(){
     $("#energyboard").text(energy);
     energy_canvasContext.clearRect(0,0,WIDTH,HEIGHT);
     energy_canvasContext.fillStyle = ENERGY_COLOR;
-    energy_canvasContext.fillRect(0, 0, energy*WIDTH/100, HEIGHT);
+    energy_canvasContext.fillRect(0, 0, energy*WIDTH/170, HEIGHT);
 }
