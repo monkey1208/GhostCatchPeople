@@ -106,7 +106,7 @@ game_socket.on('connection', function(socket){
 				var danger_id = Math.random();
 				danger_position[danger_id] = { x:player_position[socket.id].x , y:player_position[socket.id].y };
 				setTimeout(function(){
-					explode_position[danger_id] = {x:danger_position[danger_id].x, y:danger_position[danger_id].y};
+					explode_position[danger_id] = {x:danger_position[danger_id].x, y:danger_position[danger_id].y, id:socket.id};
 					delete danger_position[danger_id];
 					setTimeout(function(){
 						delete explode_position[danger_id];
