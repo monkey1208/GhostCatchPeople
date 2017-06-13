@@ -23,12 +23,14 @@ var mediaStreamSource = null;
 var meter = null;
 
 window.onload = function(){
-    var Img = {};
-    Img.ghost = new Image();
-    Img.ghost.src = "src/img/ghost.jpg";
-    Img.human = new Image();
-    Img.human.src = "src/img/human.jpg";
-   width = $(window).width();
+	var box = document.getElementById("box");
+    var ctx = box.getContext("2d");
+	var Img = {};
+	Img.ghost = new Image();
+	Img.ghost.src = "src/img/ghost.jpg";
+	Img.human = new Image();
+	Img.human.src = "src/img/human.jpg";
+    width = $(window).width();
     height = $(window).height();
 
     /*This section is for volume recognizing */
@@ -58,36 +60,49 @@ window.onload = function(){
     /*Section ends */
 
    socket.on('init', function(data){
-       game_map = data.game_map
-       for(var i = 0; i < 21; i ++){
-           for(var j = 0; j < 41; j ++){
-               for(var k = 0; k<block_size; k ++){
-                   for(var l = 0; l<block_size; l ++){
-                       map_init[i*block_size+k][j*block_size+l] = game_map[i][j]
-                   }
-               }
-           }
-        }
-        x = data.x;
-        y = data.y;
-        id = data.id;
-        isGhost = data.isGhost;
-        if(isGhost)
-            me = Img.ghost;
-        else{
-            me = Img.human;
-         setInterval(function(){
-            score += 1;
-            $("#scoreboard").text(score);
-         }, 1000);
-        }
-        console.log("init success!");
-    });
-    var box = document.getElementById("box");
-    //box.style.width = width;
-   //box.style.height = height;
-   var ctx = box.getContext("2d");
-    console.log('test');
+	   game_map = data.game_map
+	   for(var i = 0; i < 21; i ++){
+		   for(var j = 0; j < 41; j ++){
+			   for(var k = 0; k<block_size; k ++){
+				   for(var l = 0; l<block_size; l ++){
+					   map_init[i*block_size+k][j*block_size+l] = game_map[i][j]
+				   }
+			   }
+		   }
+	    }
+		x = data.x;
+		y = data.y;
+		id = data.id;
+		isGhost = data.isGhost;
+		if(isGhost)
+			me = Img.ghost;
+		else{
+			me = Img.human;
+		 setInterval(function(){
+		    score += 1;
+		    $("#scoreboard").text(score);
+		 }, 1000);
+		}
+
+      getPosition(x, y);
+		ctx.clearRect(0, 0, 1000, 500);
+      var imgData = ctx.getImageData(0, 0, 1000, 500);
+		var img = imgData.data;
+      for(var i = 0; i < img.length; i += 4){
+          my = y_edge1+Math.floor((i/4)/1000);
+          mx = x_edge1+(i/4)%1000;
+         if(map_init[my][mx]>=0.7){ // map_init[??] >= 0.7
+            img[i+3] = 255;
+         }
+         else{
+            img[i+3] = 0;
+         }
+      }
+      ctx.putImageData(imgData, 0, 0);
+      ctx.drawImage(me, 0, 0, me.width, me.height, x_mypos, y_mypos, 50, 50);
+		console.log("init success!");
+	});
+	console.log('test');
 
     window.onkeydown = function(e){
         //ctx.clearRect(0, 0, 1000, 500);
@@ -128,45 +143,54 @@ window.onload = function(){
                 skill = 3;
                 update_pos = false;
                 break;
+		}
+		if(update_pos){
+			// Collision with wall
+			while(map_init[y][x]>0 || map_init[y+block_size-1][x+block_size-1]>0 ||
+				  map_init[y+block_size-1][x]>0 || map_init[y][x+block_size-1]>0){
+				if(x > oldX){
+					x--;
+				}else if(x < oldX){
+					x++;
+				}
+				if(y > oldY){
+					y--;
+				}else if(y <oldY){
+					y++;
+				}
+			}
+			socket.emit('newPosition', {x: x, y: y}, function(data){
+			});
+		}
+		else{
+			// skill!
+			// TODO voice control skill
+			// below is an example
+			socket.emit('skill', {skill: skill}, function(data){});
+		}
+	}
+	socket.on('newPosition', function(d){
+		ctx.clearRect(0, 0, 1000, 500);
+		var imgData = ctx.getImageData(0, 0, 1000, 500);
+		var img = imgData.data;
+		var player_position = {};
 
-        }
-        if(update_pos){
-            // Collision with wall
-            if(map_init[y][x]>0 || map_init[y+block_size-1][x+block_size-1]>0){
-                x = oldX;
-                y = oldY;
-            }
-            socket.emit('newPosition', {x: x, y: y}, function(data){
-            });
-        }
-        else{
-            // skill!
-            // TODO voice control skill
-            // below is an example
-            socket.emit('skill', {skill: skill}, function(data){});
-        }
-    }
-    socket.on('newPosition', function(d){
-        var imgData = ctx.getImageData(0, 0, 1000, 500);
-        var img = imgData.data;
-        ctx.clearRect(0, 0, 1000, 500);
-        var player_position = {};
-        
-        var data = d.pack;
-        var danger_pos = d.danger_pos;
-            //console.log(danger_pos);
-        var explode_pos = d.explode_pos;
+		var data = d.pack;
+		var danger_pos = d.danger_pos;
+        	//console.log(danger_pos);
+		var explode_pos = d.explode_pos;
 
-        for(var i = 0; i < data.length; i++){
-            if(id == data[i].id){
-                x = data[i].x;
-                y = data[i].y;
-            }else{
-                var position = {x:data[i].x, y:data[i].y, isGhost:data[i].isGhost, id:data[i].id};
-                player_position[data[i].id] = position;
-            }
-        }
-        getPosition(x, y); 
+		for(var i = 0; i < data.length; i++){
+			if(id == data[i].id){
+				x = data[i].x;
+				y = data[i].y;
+			}else{
+				var position = {x:data[i].x, y:data[i].y, isGhost:data[i].isGhost, id:data[i].id};
+				player_position[data[i].id] = position;
+         }
+		}
+        getPosition(x, y);
+        dead = 0;
         for(var i = 0; i < img.length; i += 4){
             my = y_edge1+Math.floor((i/4)/1000);
             mx = x_edge1+(i/4)%1000;
@@ -175,7 +199,7 @@ window.onload = function(){
                 img[i+1] = 0;
                 img[i+2] = 0;
                 img[i+3] = 255;
-            } else{
+            } else {
                 img[i+3] = 0;
             }
             for (var j in danger_pos) {
@@ -197,11 +221,15 @@ window.onload = function(){
                     img[i+2] = 0;
                     img[i+3] = 255;
                 }
+                if (inExplodeRange2(x, y, exp_x, exp_y)) dead = 1;
             }
         }
         ctx.putImageData(imgData, 0, 0);
         ctx.drawImage(me, 0, 0, me.width, me.height, x_mypos, y_mypos, 50, 50);
-
+        if (dead) {
+            socket.disconnect();
+            document.location.href = "/";
+        }
         for(var i in player_position){
             if(player_position[i].x > x_edge1 && player_position[i].x < x_edge2 
                && player_position[i].y > y_edge1 && player_position[i].y < y_edge2){
@@ -231,8 +259,7 @@ window.onload = function(){
        else{
            speed = 5+Math.floor(40*meter.volume);
        }
-       
-    });
+	});
 }
 
 function isCollide(rect1, x, y) {
@@ -350,4 +377,7 @@ function getPosition(x, y){
 
 function inExplodeRange(x, y, exp_x, exp_y) {
     return exp_x <= x+50 && exp_y <= y+50 && exp_x >= x-100 && exp_y >= y-100;
+}
+function inExplodeRange2(x, y, exp_x, exp_y) {
+    return exp_x <= x+100 && exp_y <= y+100 && exp_x >= x-100 && exp_y >= y-100;
 }
