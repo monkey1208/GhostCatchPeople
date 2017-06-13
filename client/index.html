@@ -4,11 +4,28 @@
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
       <script src="/src/js/index.js"></script>
 		<link rel="stylesheet" type="text/css" href="./src/css/index.css">
-		<title>Ghost Catch People</title>
+      <title>Ghost Catch People</title>
 	</head>
-	<body background="./src/img/bg.jpg">
-		<br><center>Press Join to join game</center> 
-		<br><center><button onclick="join()">Join</button></center>
+	<body style="background:linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('src/img/bg.jpg');background-size:contain;">
+      <div style="text-align:center;"><img src="./src/img/scroll.png" width="600" height="700" style="display:inline-block; text-align:center;"></div>
+      <div id="content1" style="text-align:center; width:100%; position:absolute; top:150px;" onclick="switchContent(2);">
+         <div class="title"  style="color:#7B0B1F;"><span>Ghost Catch People</span></div>
+         <button>Introduction</button><br>
+         <button onclick="join()" >Join Game</button>
+			<div style="font-family:'Mountains of Christmas'; margin-top:50px; color:#7B0B1F;">
+				Developer: 2017CNL-Team03
+			</div>
+      </div>
+		<div id="content2">
+			<div class="title">Introduction</div>
+			<p>- Press arrow keys to move around.</p>
+			<p>- The louder you shout, the faster you move.</p>
+			<p>- If you are a Ghost: Catch human to gain score!</p>
+			<p>- If you are a Human: Live as long as you can!</p>
+			<p>- Skills: &nbsp;Q > BOMB!!! &nbsp;&nbsp;  W > Camouflage~</p>
+			<p>E > Teleport &nbsp;&nbsp; R > Flash</p>
+			<button onclick="switchContent(1);">Back</button>
+		</div>
 	</body>
 
 </html>

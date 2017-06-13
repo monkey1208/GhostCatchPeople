@@ -1,4 +1,20 @@
-var socket = io('//localhost:8000/game');
+// Game Constants Setting
+var GHOST_ENERGY_RECOVER_PER_SECOND = 5
+var HUMAN_ENERGY_RECOVER_PER_SECOND = 10
+var MAX_ENERGY = 100
+var Q_COST_ENERGY = 20
+var W_COST_ENERGY = 30
+var E_COST_ENERGY = 60
+var R_COST_ENERGY = 40
+var R_DISTANCE = 180
+
+// Displaying Constansts
+var WIDTH=500;
+var HEIGHT=50;
+var ENERGY_COLOR = '#EEEE00'
+
+var server_ip = 'localhost'
+var socket = io('//'+server_ip+':8000/game');
 
 var map_width = 2100;
 var map_height = 1100;
@@ -8,19 +24,25 @@ for(var i = 0; i < map_height; i ++){
 }
 
 var x = 500, y = 250;
+var flash_x, flash_y;
 var x_edge1 = 0, x_edge2 = 1000;
 var y_edge1 = 0, y_edge2 = 500;
 var x_mypos = 500, y_mypos = 250;
 var id, isGhost;
-var score = 0;
+var energy = 0;
 var width, height;
 var speed = 30;
 var block_size = 100;
 var game_map;
 var me;
+var lastkey = 0;
 
+//For volume detection & energy system
 var mediaStreamSource = null;
 var meter = null;
+var speed_canvasContext = null;
+var energy_canvasContext = null;
+
 
 window.onload = function(){
 	var box = document.getElementById("box");
@@ -42,6 +64,8 @@ window.onload = function(){
     height = $(window).height();
 
     /*This section is for volume recognizing */
+    speed_canvasContext = document.getElementById( "speed" ).getContext("2d");
+    energy_canvasContext = document.getElementById( "energy" ).getContext("2d");
     // monkeypatch Web Audio
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
     // grab an audio context
@@ -82,14 +106,24 @@ window.onload = function(){
 		y = data.y;
 		id = data.id;
 		isGhost = data.isGhost;
-		if(isGhost)
+		if(isGhost){
 			me = Img.ghost;
-		else{
+      setInterval(function(){
+        energy += GHOST_ENERGY_RECOVER_PER_SECOND;
+        if (energy > MAX_ENERGY){
+          energy = MAX_ENERGY
+        }
+        update_energy_display();
+      }, 1000);
+    }else{
 			me = Img.human;
-		 setInterval(function(){
-		    score += 1;
-		    $("#scoreboard").text(score);
-		 }, 1000);
+		  setInterval(function(){
+		    energy += HUMAN_ENERGY_RECOVER_PER_SECOND;
+        if (energy > MAX_ENERGY){
+          energy = MAX_ENERGY
+        }
+        update_energy_display();
+		  }, 1000);
 		}
 		console.log("init success!");
 	});
@@ -103,46 +137,62 @@ window.onload = function(){
 		var oldX = x, oldY = y;
 		switch(e.keyCode){
 			case 37:
+				lastkey = 1;
 				if(x >= block_size){ //505
 					x -= speed;
 				}
 				break;
 			case 38:
+				lastkey = 2;
 				if(y >= block_size){ //255
 					y -= speed;
 				}
 				break;
 			case 39:
+				lastkey = 3;
 				if(x <= map_width - block_size){ //1495
 					x += speed;
 				}
 				break;
 			case 40:
+				lastkey = 4;
 				if(y <= map_height - block_size){ //745
 					y += speed;
 				}
 				break;
 			case 81: // q
-				if(score >= 100){
-					score -= 100;
+				if(energy >= Q_COST_ENERGY){
+					energy -= Q_COST_ENERGY;
+          update_energy_display();
 					skill = 1;
 					update_pos = false;
 				}
 				break;
 			case 87: // w
-				if(score >= 50){
-					score -= 50;
+				if(energy >= W_COST_ENERGY){
+					energy -= W_COST_ENERGY;
+          update_energy_display();
 					skill = 2;
 					update_pos = false;
 					break;
 				}
 			case 69: // e
-				if(score >= 75){
-					score -= 75;
+				if(energy >= E_COST_ENERGY){
+					energy -= E_COST_ENERGY;
+          update_energy_display();
 					skill = 3;
 					update_pos = false;
 					break;
 				}
+			case 82: //r
+        if(energy >= R_COST_ENERGY){
+          energy -= R_COST_ENERGY;
+          update_energy_display();
+          update_pos = false;
+          skill = 4;
+          flash();
+          break;
+        }
 		}
 		if(update_pos){
 			// Collision with wall
@@ -166,7 +216,11 @@ window.onload = function(){
 			// skill!
 			// TODO voice control skill
 			// below is an example
-			socket.emit('skill', {skill: skill}, function(data){});
+			if(skill == 4){
+				socket.emit('skill', {skill: skill, x:flash_x, y:flash_y}, function(data){});
+			}else{
+				socket.emit('skill', {skill: skill}, function(data){});
+			}
 		}
 	}
 	socket.on('newPosition', function(d){
@@ -278,19 +332,18 @@ window.onload = function(){
                && player_position[i].y > y_edge1 && player_position[i].y < y_edge2){
                 if(player_position[i].isGhost){
                     ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, player_position[i].x - x_edge1, player_position[i].y - y_edge1, 50, 50);
-
-		}
+		            }
                 else{
                     ctx.drawImage(Img.human, 0, 0, Img.human.width, Img.human.height, player_position[i].x - x_edge1, player_position[i].y - y_edge1, 50, 50);
-		}
-                }
+		            }
+            }
             if(isCollide(player_position[i], x, y)){
                 console.log(player_position[i],x,y);
-                if(isGhost){
-                    score += 100;
-                    $("#scoreboard").text(score);
+                if(isGhost && !(player_position[i].isGhost)){
+                    energy = MAX_ENERGY;
+                    update_energy_display();
                 }
-                else{
+                else if(!(isGhost) && player_position[i].isGhost){
                     socket.disconnect();
                     document.location.href = "/";
                 }
@@ -303,7 +356,15 @@ window.onload = function(){
            console.log("Mic is not avialible yet.");
        }
        else{
+           speed_canvasContext.clearRect(0,0,WIDTH,HEIGHT);
+           if (meter.checkClipping())
+            speed_canvasContext.fillStyle = "red";
+           else
+            speed_canvasContext.fillStyle = "green";
            speed = 5+Math.floor(40*meter.volume);
+           speed_canvasContext.fillRect(0, 0, speed*WIDTH/45, HEIGHT);
+           $("#speedboard").text(speed);
+
        }
 	});
 }
@@ -315,8 +376,59 @@ function isCollide(rect1, x, y) {
          && rect1.y >= y - 50;
 }
 
+function flash(){
+    var current_x = x;
+    var current_y = y;
+    //console.log("current x="+current_x+" y="+current_y);
+    if(lastkey == 1){
+	for(var i = R_DISTANCE; i >= 0; i--){
+	    //console.log("left = "+map_init[current_y][current_x-i]+" right = "+map_init[current_y][current_x-i+50]);
+	    if(current_x-i<0)
+		continue;
+	    if(map_init[current_y][current_x-i] == 0 && map_init[current_y][current_x-i+50] == 0 && map_init[current_y+50][current_x-i] == 0 && map_init[current_y+50][current_x-i+50] == 0){
+		flash_x = current_x - i;
+		flash_y = current_y;
+		break;
+	    }
+	}
+    }else if(lastkey == 2){
+	for(var i = R_DISTANCE; i >= 0; i--){
+	    if(current_y-i<0)
+		continue;
+	    if(map_init[current_y-i][current_x] == 0 && map_init[current_y-i+50][current_x] == 0 && map_init[current_y-i+50][current_x+50] == 0 && map_init[current_y-i][current_x+50] == 0){
+		flash_x = current_x;
+		flash_y = current_y - i;
+		break;
+	    }
+	}
+    }else if(lastkey == 3){
+	for(var i = R_DISTANCE; i >= 0; i--){
+	    if(current_x+i+50>=map_width)
+		continue;
+	    if(map_init[current_y][current_x+i] == 0 && map_init[current_y][current_x+i+50] == 0 && map_init[current_y+50][current_x+i] == 0 && map_init[current_y+50][current_x+i+50] == 0){
+		flash_x = current_x + i;
+		flash_y = current_y;
+		break;
+	    }
+	}
+	
+    }else{
+	for(var i = R_DISTANCE; i >= 0; i--){
+	    if(current_y+i+50>=map_height)
+		continue;
+	    if(map_init[current_y+i][current_x] == 0 && map_init[current_y+i+50][current_x] == 0 && map_init[current_y+i+50][current_x+50] == 0 && map_init[current_y+i][current_x+50] == 0){
+		flash_x = current_x;
+		flash_y = current_y + i;
+		break;
+	    }
+	}
+        
+    }
+    //console.log("flash to x="+flash_x+" y="+flash_y);
+	
+}
 //Following part is for volume detection
-
+// Reference : https://github.com/cwilso/volume-meter
 function didntGetStream() {
     console.log('Stream generation failed.');
     alert('Stream generation failed.');
@@ -426,4 +538,11 @@ function inExplodeRange(x, y, exp_x, exp_y) {
 }
 function inExplodeRange2(x, y, exp_x, exp_y) {
     return exp_x <= x+100 && exp_y <= y+100 && exp_x >= x-100 && exp_y >= y-100;
+}
+
+function update_energy_display(){
+    $("#energyboard").text(energy);
+    energy_canvasContext.clearRect(0,0,WIDTH,HEIGHT);
+    energy_canvasContext.fillStyle = ENERGY_COLOR;
+    energy_canvasContext.fillRect(0, 0, energy*WIDTH/100, HEIGHT);
 }
