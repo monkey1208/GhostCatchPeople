@@ -69,7 +69,7 @@ window.onload = function(){
 	window.onkeydown = function(e){
 		//ctx.clearRect(0, 0, 1000, 500);
 		var update_pos = true;
-        var skill_code = 0;
+        var skill = 0;
 		switch(e.keyCode){
 			case 37:
 				if(x >= 10){ //505
@@ -92,15 +92,15 @@ window.onload = function(){
 				}
 				break;
 			case 81: // q
-                skill_code = 1;
+                skill = 1;
 				update_pos = false;
 				break;
 			case 87: // w
-                skill_code = 2;
+                skill = 2;
 				update_pos = false;
 				break;
 			case 69: // e
-                skill_code = 3;
+                skill = 3;
 				update_pos = false;
 				break;
 				
@@ -113,7 +113,7 @@ window.onload = function(){
 			// skill!
 			// TODO voice control skill
 			// below is an example
-			socket.emit('skill', {skill: skill_code}, function(data){});
+			socket.emit('skill', {skill: skill}, function(data){});
 		}
 		
 	}
@@ -128,16 +128,15 @@ window.onload = function(){
 			if(id == data[i].id){
 				x = data[i].x;
 				y = data[i].y;
+                if (data[i].skill == 2)
+                    speed = 20;
+                else
+                    speed = 10;
 			}else{
 				var position = {x:data[i].x, y:data[i].y, isGhost:data[i].isGhost, id:data[i].id};
 				player_position[data[i].id] = position;
          }
 		}
-        // skill 2
-        if (data.skill == 2 )
-            speed = 20
-        else
-            speed = 10
         
 		x_edge1 = x - 500;
 		x_edge2 = x + 500;

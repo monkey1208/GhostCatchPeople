@@ -105,7 +105,7 @@ game_socket.on('connection', function(socket){
 				player_position[socket.id].skill = 2;
 				setTimeout(function(){
 					player_position[socket.id].skill = 0;},
-					3000, '3sec boost!');
+					3000, '10sec boost!');
 				break;
 			case 3:
 				player_position[socket.id].x = Math.floor((Math.random()*(map_max_width-500))+500);
@@ -133,7 +133,7 @@ setInterval(function(){
 			x:player_position[socket.id].x,
 			y:player_position[socket.id].y,
 			isGhost:socket.isGhost,
-			skill:socket.skill
+			skill:player_position[socket.id].skill,
 		});
 	}
 	for (var i in socket_list){
