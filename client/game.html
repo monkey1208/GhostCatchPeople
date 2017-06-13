@@ -6,9 +6,11 @@
 		<link rel="stylesheet" type="text/css" href="src/css/game.css">
 		<title>Ghost Catch People</title>
 	</head>
-	<body>
-      <center><canvas id="box" width="1000" height="500" style="border:2px solid #000000"></canvas></center>
-	   <div>Score:<span id='scoreboard'>0</span></div>
+	<body style="background:rgba(73, 6, 18, 1)">
+      <div id="title">
+         <div style="float:left;">Welcome, My Guest!</div>
+      </div>
+      <center><canvas id="box" width="1000" height="500" style="margin-top:20px;z-index:1000; border:solid 5px #240309;"></canvas></center>
       <canvas id="speed" width="500" height="50"></canvas>
       <canvas id="energy" width="500" height="50"></canvas>
    </body>

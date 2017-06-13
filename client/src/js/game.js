@@ -16,7 +16,7 @@ var score = 0;
 var width, height;
 var speed = 30;
 var block_size = 100;
-var game_map;
+var game_map = null;
 var me;
 
 var mediaStreamSource = null;
@@ -24,7 +24,8 @@ var meter = null;
 
 window.onload = function(){
 	var box = document.getElementById("box");
-    var ctx = box.getContext("2d");
+   var ctx = box.getContext("2d");
+   ctx.clearRect(0, 0, 1000, 500);
 	var Img = {};
 	Img.ghost = new Image();
 	Img.ghost.src = "src/img/ghost.jpg";
@@ -68,7 +69,7 @@ window.onload = function(){
     /*Section ends */
 
    socket.on('init', function(data){
-	   game_map = data.game_map
+      game_map = data.game_map
 	   for(var i = 0; i < 11; i ++){
 		   for(var j = 0; j < 21; j ++){
 			   for(var k = 0; k<block_size; k ++){
