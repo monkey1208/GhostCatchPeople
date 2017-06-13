@@ -1,18 +1,12 @@
-// Volume detection ref: https://github.com/cwilso/volume-meter/
-
 var socket = io('//localhost:8000/game');
-var map_init = new Array(1000);
-/* TODO */
-/* generate a reasonable map */
 
-for(var i = 0; i < 1000; i ++){
-	map_init[i] = new Array(2000);
+var map_width = 2050;
+var map_height = 1050;
+var map_init = new Array(map_height);
+for(var i = 0; i < map_height; i ++){
+	map_init[i] = new Array(map_width);
 }
-for(var i = 0; i < 1000; i ++){
-	for(var j = 0; j < 2000; j ++){
-		map_init[i][j] = Math.random();
-	}
-}
+
 var x = 500, y = 250;
 var x_edge1 = 0, x_edge2 = 1000;
 var y_edge1 = 0, y_edge2 = 500;
@@ -20,6 +14,8 @@ var id, isGhost;
 var score = 0;
 var width, height;
 var speed = 30;
+var block_size = 50;
+var game_map;
 
 var mediaStreamSource = null;
 var meter = null;
@@ -57,23 +53,32 @@ window.onload = function(){
         console.log("getUserMedia not supported");
         alert('getUserMedia threw exception :' + e);
     }
-
     /*Section ends */
-   
+
    socket.on('init', function(data){
+	   game_map = data.game_map
+	   for(var i = 0; i < 21; i ++){
+		   for(var j = 0; j < 41; j ++){
+			   for(var k = 0; k<block_size; k ++){
+				   for(var l = 0; l<block_size; l ++){
+					   map_init[i*block_size+k][j*block_size+l] = game_map[i][j]
+				   }
+			   }
+		   }
+	    }
 		x = data.x;
 		y = data.y;
 		id = data.id;
 		isGhost = data.isGhost;
-      if(isGhost)
+		if(isGhost)
 			me.src = Img.ghost.src;
 		else{
 			me.src = Img.human.src;
-         setInterval(function(){
-            score += 1;
-            $("#scoreboard").text(score);
-         }, 1000);
-      }
+		 setInterval(function(){
+		    score += 1;
+		    $("#scoreboard").text(score);
+		 }, 1000);
+		}
 		console.log("init success!");
 	});
 	var box = document.getElementById("box");
@@ -82,44 +87,30 @@ window.onload = function(){
    var ctx = box.getContext("2d");
 	console.log('test');
 
-	
-	/*var imgData = ctx.getImageData(0, 0, 1000, 500);
-	var data = imgData.data;
-
-	for(var i = 0; i < data.length; i += 4){
-		// console.log(map_init[y+Math.floor((i/4)/1000)][x+(i/4)%1000]);
-		if(map_init[y+Math.floor((i/4)/1000)][x+(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
-			data[i+3] = 255;
-
-		}
-		else{
-			data[i+3] = 0;
-		}
-	}
-	ctx.putImageData(imgData, 0, 0);*/
-	
 	window.onkeydown = function(e){
 		//ctx.clearRect(0, 0, 1000, 500);
 		var update_pos = true;
         var skill = 0;
+		var speed = 50;
+		var oldX = x, oldY = y;
 		switch(e.keyCode){
 			case 37:
-				if(x >= 10){ //505
+				if(x >= 50){ //505
 					x -= speed;
 				}
 				break;
 			case 38:
-				if(y >= 10){ //255
+				if(y >= 50){ //255
 					y -= speed;
 				}
 				break;
 			case 39:
-				if(x <= 1940){ //1495
+				if(x <= 2000){ //1495
 					x += speed;
 				}
 				break;
 			case 40:
-				if(y <= 950){ //745
+				if(y <= 100){ //745
 					y += speed;
 				}
 				break;
@@ -135,9 +126,14 @@ window.onload = function(){
                 skill = 3;
 				update_pos = false;
 				break;
-				
-		}	
+
+		}
 		if(update_pos){
+			// Collision with wall
+			if(map_init[y][x]>0 || map_init[y+block_size-1][x+block_size-1]>0){
+				x = oldX;
+				y = oldY;
+			}
 			socket.emit('newPosition', {x: x, y: y}, function(data){
 			});
 		}
@@ -147,18 +143,14 @@ window.onload = function(){
 			// below is an example
 			socket.emit('skill', {skill: skill}, function(data){});
 		}
-		
 	}
-	socket.on('newPosition', function(d){
+	socket.on('newPosition', function(data){
 		var imgData = ctx.getImageData(0, 0, 1000, 500);
 		var img = imgData.data;
 		ctx.clearRect(0, 0, 1000, 500);
 		var me = document.getElementById("me");
 		var player_position = {};
-		
-		var data = d.pack;
-		var danger_pos = d.danger_pos;
-		var explode_pos = d.explode_pos;
+
 		for(var i = 0; i < data.length; i++){
 			if(id == data[i].id){
 				x = data[i].x;
@@ -172,7 +164,7 @@ window.onload = function(){
 				player_position[data[i].id] = position;
          }
 		}
-        
+
 		x_edge1 = x - 500;
 		x_edge2 = x + 500;
 		y_edge1 = y - 250;
@@ -183,9 +175,9 @@ window.onload = function(){
          x_edge_2 = 1000;
          me.style.left = width/2 + (x - 500);
       }
-      else if(x >= 1500){
-         x_edge1 = 1000;
-         x_edge2 = 2000;
+      else if(x >= 1550){
+         x_edge1 = 1050;
+         x_edge2 = 2050;
          me.style.left = width/2 + (x - 1500);
       }
       if(y <= 250){
@@ -193,10 +185,10 @@ window.onload = function(){
          y_edge2 = 500;
          me.style.top = 250 + (y - 250);
       }
-      else if(y >= 750){
-         y_edge1 = 500;
-         y_edge2 = 1000;
-         me.style.top = 250 + (y - 750);
+      else if(y >= 800){
+         y_edge1 = 550;
+         y_edge2 = 1050;
+         me.style.top = 300 + (y - 800);
       }
       for(var i = 0; i < img.length; i += 4){
          if(map_init[y_edge1+Math.floor((i/4)/1000)][x_edge1+(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
@@ -230,14 +222,9 @@ window.onload = function(){
          }
 		}
       /* TODO */
-      /* continually read incoming volume and tell if it is a skill, 
+      /* continually read incoming volume and tell if it is a skill,
        * volume --> affect speed, */
-       if(meter == null){
-           console.log("mic unable now.");
-       }
-       else{
-       	console.log("Current volume "+meter.volume);
-       }
+       console.log("Current volume "+meter.volume);
 	});
 }
 
@@ -323,4 +310,3 @@ function volumeAudioProcess( event ) {
     // want "fast attack, slow release."
     this.volume = Math.max(rms, this.volume*this.averaging);
 }
-
