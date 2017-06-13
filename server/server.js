@@ -29,6 +29,8 @@ app.get('/game', function(req, res){
 
 var socket_list = {};
 var player_position = {};
+var danger_position = {};
+var explode_position = {};
 var ghost_num = 0;
 var people_num = 0;
 var game_socket = io.of('/game');
@@ -222,6 +224,6 @@ setInterval(function(){
 	}
 	for (var i in socket_list){
 		var socket = socket_list[i];
-		socket.emit('newPosition', pack);
+		socket.emit('newPosition', {pack:pack, danger_pos:danger_position, explode_pos:explode_position});
 	}
 }, 1000/15);

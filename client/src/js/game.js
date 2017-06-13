@@ -154,7 +154,7 @@ window.onload = function(){
 		
 		var data = d.pack;
 		var danger_pos = d.danger_pos;
-        console.log(danger_pos);
+        	//console.log(danger_pos);
 		var explode_pos = d.explode_pos;
 
 		for(var i = 0; i < data.length; i++){
