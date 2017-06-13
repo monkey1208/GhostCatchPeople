@@ -339,7 +339,7 @@ function flash(){
 	    //console.log("left = "+map_init[current_y][current_x-i]+" right = "+map_init[current_y][current_x-i+50]);
 	    if(current_x-i<0)
 		continue;
-	    if(map_init[current_y][current_x-i] == 0 && map_init[current_y][current_x-i+50] == 0){
+	    if(map_init[current_y][current_x-i] == 0 && map_init[current_y][current_x-i+50] == 0 && map_init[current_y+50][current_x-i] == 0 && map_init[current_y+50][current_x-i+50] == 0){
 		flash_x = current_x - i;
 		flash_y = current_y;
 		break;
@@ -349,7 +349,7 @@ function flash(){
 	for(var i = 180; i >= 0; i--){
 	    if(current_y-i<0)
 		continue;
-	    if(map_init[current_y-i][current_x] == 0 && map_init[current_y-i+50][current_x] == 0){
+	    if(map_init[current_y-i][current_x] == 0 && map_init[current_y-i+50][current_x] == 0 && map_init[current_y-i+50][current_x+50] == 0 && map_init[current_y-i][current_x+50] == 0){
 		flash_x = current_x;
 		flash_y = current_y - i;
 		break;
@@ -359,7 +359,7 @@ function flash(){
 	for(var i = 180; i >= 0; i--){
 	    if(current_x+i+50>=map_width)
 		continue;
-	    if(map_init[current_y][current_x+i] == 0 && map_init[current_y][current_x+i+50] == 0){
+	    if(map_init[current_y][current_x+i] == 0 && map_init[current_y][current_x+i+50] == 0 && map_init[current_y+50][current_x+i] == 0 && map_init[current_y+50][current_x+i+50] == 0){
 		flash_x = current_x + i;
 		flash_y = current_y;
 		break;
@@ -370,7 +370,7 @@ function flash(){
 	for(var i = 180; i >= 0; i--){
 	    if(current_y+i+50>=map_height)
 		continue;
-	    if(map_init[current_y+i][current_x] == 0 && map_init[current_y+i+50][current_x] == 0){
+	    if(map_init[current_y+i][current_x] == 0 && map_init[current_y+i+50][current_x] == 0 && map_init[current_y+i+50][current_x+50] == 0 && map_init[current_y+i][current_x+50] == 0){
 		flash_x = current_x;
 		flash_y = current_y + i;
 		break;
