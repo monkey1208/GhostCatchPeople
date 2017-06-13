@@ -51,9 +51,9 @@ window.onload = function(){
    ctx.clearRect(0, 0, 1000, 500);
 	var Img = {};
 	Img.ghost = new Image();
-	Img.ghost.src = "src/img/ghost.jpg";
+	Img.ghost.src = "src/img/ghost.png";
 	Img.human = new Image();
-	Img.human.src = "src/img/human.jpg";
+	Img.human.src = "src/img/human2.png";
 	Img.floor = new Image();
 	Img.floor.src = "src/img/floor.png";
 	Img.wall1 = new Image();
@@ -402,7 +402,7 @@ window.onload = function(){
                 }
                 else if(!(isGhost) && player_position[i].isGhost){
                     socket.disconnect();
-                    document.location.href = "/";
+                    document.location.href = "/gameover";
                 }
              }
         }

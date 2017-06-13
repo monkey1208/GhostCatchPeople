@@ -19,3 +19,7 @@ function switchContent(id){
       $("#content2").slideToggle();
    }
 }
+function gotoHomepage(){
+   console.log("homepage");
+   document.location.href = "/";
+}

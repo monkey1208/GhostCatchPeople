@@ -34,6 +34,11 @@ app.get('/monitor', function(req, res){
 	res.sendFile(path.join(__dirname, '../', 'client', 'monitor.html'));
 	console.log("monitor");
 });
+app.get('/gameover', function(req, res){
+	res.sendFile(path.join(__dirname, '../', 'client', 'gameover.html'));
+	console.log("gameover");
+});
+
 
 var socket_list = {};
 var player_position = {};
