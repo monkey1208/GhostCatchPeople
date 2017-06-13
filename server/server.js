@@ -184,11 +184,16 @@ game_socket.on('connection', function(socket){
 				player_position[socket.id].skill = 2;
 				setTimeout(function(){
 					player_position[socket.id].skill = 0;},
-					3000, '10sec boost!');
+					3000, '3sec boost!');
 				break;
 			case 3:
-				player_position[socket.id].x = Math.floor((Math.random()*(map_max_width-500))+500);
-				player_position[socket.id].y = Math.floor((Math.random()*(map_max_height-250))+250);
+				var randx = Math.floor((Math.random()*width)), randy = Math.floor((Math.random()*height));
+				while(map[randy][randx]==1){
+					randx = Math.floor((Math.random()*width));
+					randy = Math.floor((Math.random()*height));
+				}
+				player_position[socket.id].x = randx*50; 
+				player_position[socket.id].y = randy*50;
 				break;
 		}
 	});

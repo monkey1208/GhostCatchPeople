@@ -151,6 +151,11 @@ window.onload = function(){
 		var img = imgData.data;
 		ctx.clearRect(0, 0, 1000, 500);
 		var player_position = {};
+		
+		var data = d.pack;
+		var danger_pos = d.danger_pos;
+        console.log(danger_pos);
+		var explode_pos = d.explode_pos;
 
 		for(var i = 0; i < data.length; i++){
 			if(id == data[i].id){
@@ -163,7 +168,9 @@ window.onload = function(){
 		}
       getPosition(x, y); 
       for(var i = 0; i < img.length; i += 4){
-         if(map_init[y_edge1+Math.floor((i/4)/1000)][x_edge1+(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
+          my = y_edge1+Math.floor((i/4)/1000);
+          mx = x_edge1+(i/4)%1000;
+         if(map_init[my][mx]>=0.7){ // map_init[??] >= 0.7
             img[i+3] = 255;
          }
          else{
