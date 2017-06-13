@@ -123,17 +123,26 @@ window.onload = function(){
 				}
 				break;
 			case 81: // q
-                skill = 1;
-                update_pos = false;
-                break;
-            case 87: // w
-                skill = 2;
-                update_pos = false;
-                break;
-            case 69: // e
-                skill = 3;
-                update_pos = false;
-                break;
+				if(score >= 100){
+					score -= 100;
+					skill = 1;
+					update_pos = false;
+				}
+				break;
+			case 87: // w
+				if(score >= 50){
+					score -= 50;
+					skill = 2;
+					update_pos = false;
+					break;
+				}
+			case 69: // e
+				if(score >= 75){
+					score -= 75;
+					skill = 3;
+					update_pos = false;
+					break;
+				}
 		}
 		if(update_pos){
 			// Collision with wall
@@ -162,19 +171,19 @@ window.onload = function(){
 	}
 	socket.on('newPosition', function(d){
 		ctx.clearRect(0, 0, 1000, 500);
-		var imgData = ctx.getImageData(0, 0, 1000, 500);
-		var img = imgData.data;
 		var player_position = {};
 
 		var data = d.pack;
 		var danger_pos = d.danger_pos;
         	//console.log(danger_pos);
 		var explode_pos = d.explode_pos;
+		var now_skill = 0;
 
 		for(var i = 0; i < data.length; i++){
 			if(id == data[i].id){
 				x = data[i].x;
 				y = data[i].y;
+				now_skill = data[i].skill;
 			}else{
 				var position = {x:data[i].x, y:data[i].y, isGhost:data[i].isGhost, id:data[i].id};
 				player_position[data[i].id] = position;
@@ -224,6 +233,8 @@ window.onload = function(){
 			   }
  		   }
  	    }
+		var imgData = ctx.getImageData(0, 0, 1000, 500);
+		var img = imgData.data;
         for(var i = 0; i < img.length; i += 4){
             my = y_edge1+Math.floor((i/4)/1000);
             mx = x_edge1+(i/4)%1000;
@@ -251,8 +262,13 @@ window.onload = function(){
                 if (inExplodeRange2(x, y, exp_x, exp_y)) dead = 1;
             }
         }
-        // ctx.putImageData(imgData, 0, 0);
-        ctx.drawImage(me, 0, 0, me.width, me.height, x_mypos, y_mypos, 50, 50);
+        ctx.putImageData(imgData, 0, 0);
+		if(now_skill != 2) ctx.drawImage(me, 0, 0, me.width, me.height, x_mypos, y_mypos, 50, 50);
+		else{
+		    if(isGhost) ctx.drawImage(Img.human, 0, 0, Img.human.width, Img.human.height, x_mypos, y_mypos, 50, 50);
+		    else ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, x_mypos, y_mypos, 50, 50);
+		}
+
         if (dead) {
             socket.disconnect();
             document.location.href = "/";
@@ -260,10 +276,13 @@ window.onload = function(){
         for(var i in player_position){
             if(player_position[i].x > x_edge1 && player_position[i].x < x_edge2
                && player_position[i].y > y_edge1 && player_position[i].y < y_edge2){
-                if(player_position[i].isGhost)
+                if(player_position[i].isGhost){
                     ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, player_position[i].x - x_edge1, player_position[i].y - y_edge1, 50, 50);
-                else
+
+		}
+                else{
                     ctx.drawImage(Img.human, 0, 0, Img.human.width, Img.human.height, player_position[i].x - x_edge1, player_position[i].y - y_edge1, 50, 50);
+		}
                 }
             if(isCollide(player_position[i], x, y)){
                 console.log(player_position[i],x,y);
