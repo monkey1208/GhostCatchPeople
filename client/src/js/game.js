@@ -17,7 +17,7 @@ var y_edge1 = 0, y_edge2 = 500;
 var id, isGhost;
 var score = 0;
 var width, height;
-var speed = 10;
+var speed = 30;
 
 window.onload = function(){
 	var Img = {};
