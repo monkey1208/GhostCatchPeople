@@ -29,11 +29,72 @@ app.get('/game', function(req, res){
 
 var socket_list = {};
 var player_position = {};
-var danger_position = {};
-var explode_position = {};
 var ghost_num = 0;
 var people_num = 0;
 var game_socket = io.of('/game');
+
+// Map Generation
+var maze_width = 20;
+var maze_height = 10;
+var moves = [];
+var width = 2*maze_width+1;
+var height = 2*maze_height+1;
+var map = new Array(height);
+for(var i = 0; i < height; i ++){
+	map[i] = new Array(width);
+}
+for(var i = 0; i < height; i ++){
+	for(var j = 0; j < width; j ++){
+		map[i][j] = 1;
+	}
+}
+
+var x_pos = 1;
+var y_pos = 1;
+map[x_pos][y_pos] = 0;
+moves.push(y_pos+(x_pos*width));
+while(moves.length>0){
+    var possible_directions = "";
+    if(x_pos+2 > 0 && x_pos+2 <= height-1 && map[x_pos+2][y_pos] == 1){
+        possible_directions += "S";
+	}
+    if(x_pos-2 > 0 && x_pos-2 <= height-1 && map[x_pos-2][y_pos] == 1){
+        possible_directions += "N";
+    }
+	if(y_pos-2 > 0 && y_pos-2 <= width-1 && map[x_pos][y_pos-2] == 1){
+        possible_directions += "W";
+	}
+	if(y_pos+2 > 0 && y_pos+2 <= width-1 && map[x_pos][y_pos+2] == 1){
+        possible_directions += "E";
+	}
+    if(possible_directions != ""){
+        move = Math.floor((Math.random()*possible_directions.length))
+        if(possible_directions[move] == "N"){
+            map[x_pos-2][y_pos] = 0;
+            map[x_pos-1][y_pos] = 0;
+            x_pos -= 2;
+		}else if(possible_directions[move] == "S"){
+            map[x_pos+2][y_pos] = 0;
+            map[x_pos+1][y_pos] = 0;
+            x_pos +=2;
+        }else if(possible_directions[move] == "W"){
+            map[x_pos][y_pos-2] = 0;
+            map[x_pos][y_pos-1] = 0;
+            y_pos -=2;
+        }else if(possible_directions[move] == "E"){
+            map[x_pos][y_pos+2] = 0;
+            map[x_pos][y_pos+1] = 0;
+            y_pos +=2;
+        }
+		moves.push(y_pos+(x_pos*width));
+    }else{
+        var back = moves.pop();
+        x_pos = Math.floor(back/width);
+        y_pos = back%width;
+	}
+}
+console.log(map.length);
+
 io.on('connection', function(socket){
 	console.log("connect");
 });
@@ -41,8 +102,13 @@ io.on('connection', function(socket){
 game_socket.on('connection', function(socket){
 	console.log("game connected");
 	socket.id = Math.random();
-	socket.x = Math.floor((Math.random()*map_width)+500);
-	socket.y = Math.floor((Math.random()*map_height)+250);
+	var randx = Math.floor((Math.random()*width)), randy = Math.floor((Math.random()*height));
+	while(map[randy][randx]==1){
+		randx = Math.floor((Math.random()*width));
+		randy = Math.floor((Math.random()*height));
+	}
+	socket.x = randx*50;
+	socket.y = randy*50;
 	socket.skill = 0;
 	var isGhost = true;
 	if(ghost_num > people_num){
@@ -54,7 +120,7 @@ game_socket.on('connection', function(socket){
 	var position = {x:socket.x, y:socket.y, isGhost:isGhost, skill:socket.skill};
 	player_position[socket.id] = position;
 	socket_list[socket.id] = socket;
-	socket.emit('init', {x:socket.x, y:socket.y, isGhost:isGhost, id:socket.id});
+	socket.emit('init', {x:socket.x, y:socket.y, isGhost:isGhost, id:socket.id, game_map:map});
 	socket.on('disconnect', function(){
 		if(player_position[socket.id].isGhost)
 			ghost_num --;
@@ -87,7 +153,7 @@ game_socket.on('connection', function(socket){
      		delete player_position[socket.id];
 
 	});
-	socket.on('restart', function(){	
+	socket.on('restart', function(){
 		socket.x = Math.floor((Math.random()*1000)+500);
 		socket.y = Math.floor((Math.random()*500)+250);
 		if(ghost_num > people_num){
@@ -106,7 +172,7 @@ game_socket.on('connection', function(socket){
 				var danger_id = Math.random();
 				danger_position[danger_id] = { x:player_position[socket.id].x , y:player_position[socket.id].y };
 				setTimeout(function(){
-					explode_position[danger_id] = {x:danger_position[danger_id].x, y:danger_position[danger_id].y};
+					explode_position[danger_id] = {x:danger_position[danger_id].x, y:danger_position[danger_id].y, id:socket.id};
 					delete danger_position[danger_id];
 					setTimeout(function(){
 						delete explode_position[danger_id];
@@ -151,6 +217,6 @@ setInterval(function(){
 	}
 	for (var i in socket_list){
 		var socket = socket_list[i];
-		socket.emit('newPosition', {pack:pack, danger_pos:danger_position, explode_pos:explode_position});
+		socket.emit('newPosition', pack);
 	}
 }, 1000/15);
