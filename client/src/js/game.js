@@ -158,7 +158,9 @@ window.onload = function(){
 		
 		var data = d.pack;
 		var danger_pos = d.danger_pos;
+        console.log(danger_pos);
 		var explode_pos = d.explode_pos;
+
 		for(var i = 0; i < data.length; i++){
 			if(id == data[i].id){
 				x = data[i].x;
@@ -199,7 +201,9 @@ window.onload = function(){
          me.style.top = 250 + (y - 750);
       }
       for(var i = 0; i < img.length; i += 4){
-         if(map_init[y_edge1+Math.floor((i/4)/1000)][x_edge1+(i/4)%1000]>=0.7){ // map_init[??] >= 0.7
+          my = y_edge1+Math.floor((i/4)/1000);
+          mx = x_edge1+(i/4)%1000;
+         if(map_init[my][mx]>=0.7){ // map_init[??] >= 0.7
             img[i+3] = 255;
          }
          else{
