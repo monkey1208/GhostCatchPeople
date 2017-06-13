@@ -109,5 +109,3 @@ setInterval(function(){
 		socket.emit('newPosition', pack);
 	}
 }, 1000/15);
-
-
