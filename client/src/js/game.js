@@ -1,10 +1,11 @@
 // Game Constants Setting
 var GHOST_ENERGY_RECOVER_PER_SECOND = 5
 var HUMAN_ENERGY_RECOVER_PER_SECOND = 10
+var HUMAN_ENERGY_INIT = 50
 var MAX_ENERGY = 100
 var Q_COST_ENERGY = 20
 var W_COST_ENERGY = 30
-var E_COST_ENERGY = 60
+var E_COST_ENERGY = 70
 var R_COST_ENERGY = 50
 var R_DISTANCE = 180
 
@@ -123,7 +124,7 @@ window.onload = function(){
       }, 1000);
     }else{
 			me = Img.human;
-      energy = MAX_ENERGY;
+      energy = HUMAN_ENERGY_INIT;
 		  setInterval(function(){
 		    energy += HUMAN_ENERGY_RECOVER_PER_SECOND;
         if (energy > MAX_ENERGY){
@@ -435,13 +436,13 @@ function isCollide(rect1, x, y) {
 function flash(){
     var current_x = x;
     var current_y = y;
-    //console.log("current x="+current_x+" y="+current_y);
+    console.log("current x="+current_x+" y="+current_y);
     if(lastkey == 1){
 	for(var i = R_DISTANCE; i >= 0; i--){
-	    //console.log("left = "+map_init[current_y][current_x-i]+" right = "+map_init[current_y][current_x-i+50]);
+	    //console.log("left = "+map_init[current_y][current_x-i]+" right = "+map_init[current_y][current_x-i+50]+" left down = "+map_init[current_y+50][current_x-i]+" right down = "+map_init[current_y+50][current_x-i+50]);
 	    if(current_x-i<0)
 		continue;
-	    if(map_init[current_y][current_x-i] == 0 && map_init[current_y][current_x-i+50] == 0 && map_init[current_y+50][current_x-i] == 0 && map_init[current_y+50][current_x-i+50] == 0){
+	    if(map_init[current_y][current_x-i] == 0 && map_init[current_y][current_x-i+49] == 0 && map_init[current_y+49][current_x-i] == 0 && map_init[current_y+49][current_x-i+49] == 0){
 		flash_x = current_x - i;
 		flash_y = current_y;
 		break;
@@ -451,7 +452,7 @@ function flash(){
 	for(var i = R_DISTANCE; i >= 0; i--){
 	    if(current_y-i<0)
 		continue;
-	    if(map_init[current_y-i][current_x] == 0 && map_init[current_y-i+50][current_x] == 0 && map_init[current_y-i+50][current_x+50] == 0 && map_init[current_y-i][current_x+50] == 0){
+	    if(map_init[current_y-i][current_x] == 0 && map_init[current_y-i+49][current_x] == 0 && map_init[current_y-i+49][current_x+49] == 0 && map_init[current_y-i][current_x+49] == 0){
 		flash_x = current_x;
 		flash_y = current_y - i;
 		break;
@@ -461,7 +462,7 @@ function flash(){
 	for(var i = R_DISTANCE; i >= 0; i--){
 	    if(current_x+i+50>=map_width)
 		continue;
-	    if(map_init[current_y][current_x+i] == 0 && map_init[current_y][current_x+i+50] == 0 && map_init[current_y+50][current_x+i] == 0 && map_init[current_y+50][current_x+i+50] == 0){
+	    if(map_init[current_y][current_x+i] == 0 && map_init[current_y][current_x+i+49] == 0 && map_init[current_y+49][current_x+i] == 0 && map_init[current_y+49][current_x+i+49] == 0){
 		flash_x = current_x + i;
 		flash_y = current_y;
 		break;
@@ -472,7 +473,7 @@ function flash(){
 	for(var i = R_DISTANCE; i >= 0; i--){
 	    if(current_y+i+50>=map_height)
 		continue;
-	    if(map_init[current_y+i][current_x] == 0 && map_init[current_y+i+50][current_x] == 0 && map_init[current_y+i+50][current_x+50] == 0 && map_init[current_y+i][current_x+50] == 0){
+	    if(map_init[current_y+i][current_x] == 0 && map_init[current_y+i+49][current_x] == 0 && map_init[current_y+i+49][current_x+49] == 0 && map_init[current_y+i][current_x+49] == 0){
 		flash_x = current_x;
 		flash_y = current_y + i;
 		break;
@@ -480,7 +481,7 @@ function flash(){
 	}
 
     }
-    //console.log("flash to x="+flash_x+" y="+flash_y);
+    console.log("flash to x="+flash_x+" y="+flash_y);
 
 }
 //Following part is for volume detection
