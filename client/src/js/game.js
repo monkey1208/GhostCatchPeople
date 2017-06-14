@@ -248,7 +248,7 @@ window.onload = function(){
 				y = data[i].y;
 				now_skill = data[i].skill;
 			}else{
-				var position = {x:data[i].x, y:data[i].y, isGhost:data[i].isGhost, id:data[i].id};
+				var position = {x:data[i].x, y:data[i].y, isGhost:data[i].isGhost, id:data[i].id, skill:data[i].skill};
 				player_position[data[i].id] = position;
          }
 		}
@@ -345,36 +345,15 @@ window.onload = function(){
         for(var i = 0; i < img.length; i += 4){
             my = y_edge1+Math.floor((i/4)/1000);
             mx = x_edge1+(i/4)%1000;
-
-			// Draw explosion
-			/*
-            for (var j in danger_pos) {
-                exp_x = danger_pos[j].x;
-                exp_y = danger_pos[j].y;
-                if (inExplodeRange(mx, my, exp_x, exp_y)) {
-                    img[i] = 255;
-                    img[i+1] = 153;
-                    img[i+2] = 0;
-                    img[i+3] = 255;
-                }
-            }
-			*/
             for (var j in explode_pos) {
                 exp_x = explode_pos[j].x;
                 exp_y = explode_pos[j].y;
-                if (inExplodeRange(mx, my, exp_x, exp_y)) {
-					/*
-                    img[i] = 255;
-                    img[i+1] = 0;
-                    img[i+2] = 0;
-                    img[i+3] = 255;
-					*/
-                }
                 if (inExplodeRange2(x, y, exp_x, exp_y)) dead = 1;
             }
         }
         ctx.putImageData(imgData, 0, 0);
-
+        
+        // draw self
 		if(now_skill != 2) ctx.drawImage(me, 0, 0, me.width, me.height, x_mypos, y_mypos, 50, 50);
 		else{
 		    if(isGhost) ctx.drawImage(Img.human, 0, 0, Img.human.width, Img.human.height, x_mypos, y_mypos, 50, 50);
@@ -388,12 +367,11 @@ window.onload = function(){
         for(var i in player_position){
             if(player_position[i].x > x_edge1 && player_position[i].x < x_edge2
                && player_position[i].y > y_edge1 && player_position[i].y < y_edge2){
-                if(player_position[i].isGhost){
+                if(toDrawGhost(player_position[i].isGhost, player_position[i].skill)) {
                     ctx.drawImage(Img.ghost, 0, 0, Img.ghost.width, Img.ghost.height, player_position[i].x - x_edge1, player_position[i].y - y_edge1, 50, 50);
-		            }
-                else{
+		        } else{
                     ctx.drawImage(Img.human, 0, 0, Img.human.width, Img.human.height, player_position[i].x - x_edge1, player_position[i].y - y_edge1, 50, 50);
-		            }
+		        }
             }
             if(isCollide(player_position[i], x, y)){
                 console.log(player_position[i],x,y);
@@ -603,4 +581,8 @@ function update_energy_display(){
     energy_canvasContext.clearRect(0,0,WIDTH,HEIGHT);
     energy_canvasContext.fillStyle = ENERGY_COLOR;
     energy_canvasContext.fillRect(0, 0, energy*WIDTH/170, HEIGHT);
+}
+
+function toDrawGhost(isGhost, skill) {
+    return (isGhost && skill != 2) || (!isGhost && skill == 2);
 }

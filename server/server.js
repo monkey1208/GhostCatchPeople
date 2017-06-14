@@ -205,9 +205,10 @@ game_socket.on('connection', function(socket){
 			case 2:
 				player_position[socket.id].skill = 2;
 				setTimeout(function(){
-					if(player_position[socket.id] != undefined)
-						player_position[socket.id].skill = 0;},
-					W_TIMER, '3sec boost!');
+					if(player_position[socket.id] != undefined) {
+						player_position[socket.id].skill = 0;
+                    }
+                }, W_TIMER, '3sec boost!');
 				break;
 			case 3:
 				var randx = Math.floor((Math.random()*width)), randy = Math.floor((Math.random()*height));
