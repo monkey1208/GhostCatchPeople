@@ -23,7 +23,7 @@ var map_width = 2100;
 var map_height = 1100;
 var map_init = new Array(map_height);
 for(var i = 0; i < map_height; i ++){
-    map_init[i] =
+    map_init[i] = new Array(map_width);
 }
 
 var x = 500, y = 250;
