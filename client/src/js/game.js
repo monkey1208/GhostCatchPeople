@@ -1,28 +1,29 @@
 // Game Constants Setting
-var GHOST_ENERGY_RECOVER_PER_SECOND = 5
-var HUMAN_ENERGY_RECOVER_PER_SECOND = 10
-var HUMAN_ENERGY_INIT = 50
-var MAX_ENERGY = 100
-var Q_COST_ENERGY = 20
-var W_COST_ENERGY = 30
-var E_COST_ENERGY = 70
-var R_COST_ENERGY = 50
-var R_DISTANCE = 180
+var GHOST_ENERGY_RECOVER_PER_SECOND = 5;
+var HUMAN_ENERGY_RECOVER_PER_SECOND = 10;
+var HUMAN_ENERGY_INIT = 100;
+var MAX_ENERGY = 100;
+var Q_COST_ENERGY = 10;
+var W_COST_ENERGY = 30;
+var E_COST_ENERGY = 70;
+var R_COST_ENERGY = 50;
+var R_DISTANCE = 180;
+var BOMB_RANGE = 150;
 
 // Displaying Constansts
 var WIDTH=500;
 var HEIGHT=50;
 var ENERGY_COLOR = '#FF6666';
 
-var server_ip = 'localhost';
-//var server_ip = '10.5.4.95';
+//var server_ip = 'localhost';
+var server_ip = '10.5.4.95';
 var socket = io('//'+server_ip+':8000/game');
 
 var map_width = 2100;
 var map_height = 1100;
 var map_init = new Array(map_height);
 for(var i = 0; i < map_height; i ++){
-    map_init[i] = new Array(map_width);
+    map_init[i] =
 }
 
 var x = 500, y = 250;
@@ -334,8 +335,8 @@ window.onload = function(){
    					correct_wally=0;
    				}
 				ctx.drawImage(Img.explo1, img_sel_x*Img.explo1.width, img_sel_y*Img.explo1.height,
-							  Img.explo1.width, Img.explo1.height, correct_expx-50,
-							  correct_expy-50, 150, 150);
+							  Img.explo1.width, Img.explo1.height, correct_expx-100,
+							  correct_expy-100, 250, 250);
 
 		    }
         }
@@ -595,7 +596,7 @@ function inExplodeRange(x, y, exp_x, exp_y) {
     return exp_x <= x+50 && exp_y <= y+50 && exp_x >= x-100 && exp_y >= y-100;
 }
 function inExplodeRange2(x, y, exp_x, exp_y) {
-    return exp_x <= x+100 && exp_y <= y+100 && exp_x >= x-100 && exp_y >= y-100;
+    return exp_x <= x+BOMB_RANGE && exp_y <= y+BOMB_RANGE && exp_x >= x-BOMB_RANGE && exp_y >= y-BOMB_RANGE;
 }
 
 function update_energy_display(){

@@ -1,5 +1,5 @@
 // Game setting
-var BOMB_TIMER = 2000
+var BOMB_TIMER = 1500
 var W_TIMER = 5000
 
 var express = require('express');
